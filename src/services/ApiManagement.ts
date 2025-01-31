@@ -1,9 +1,9 @@
 import axios from 'axios'
 
 class ApiManagement{
-    private _user: { login: string; password: string; id: number; replica: string };
+    public _user: { login: string; password: string; id: string; replica: string; token?: string;};
 
-    constructor(user: { login: string; password: string; id: number; replica: string }){
+    constructor(user: { login: string; password: string; id: string; replica: string; token?: string;}){
         this._user = user;
     }
 

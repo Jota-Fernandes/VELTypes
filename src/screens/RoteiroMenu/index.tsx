@@ -1,11 +1,13 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
-
 import { ScreenCard } from "@components/ScreenCard";
 import { Container, Content } from "./styles";
 
-export function RoteiroMenu(){
+type RoteiroMenuRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
+export function RoteiroMenu(){
+    const route = useRoute<RoteiroMenuRouteProp>();
+    const {roteiro} = route.params;
     const {t} = useTranslation();
 
     const navigation = useNavigation();
@@ -16,7 +18,7 @@ export function RoteiroMenu(){
                 <ScreenCard 
                     icon="bug-report" 
                     title={t('armadilhas')}
-                    onPress={() => navigation.navigate('MenuArmadilhas')}
+                    onPress={() => navigation.navigate('MenuArmadilhas', {roteiro})}
                 />
                 <ScreenCard 
                     icon="visibility" 
@@ -43,7 +45,7 @@ export function RoteiroMenu(){
                 <ScreenCard 
                     icon="description" 
                     title={t('dados_do_servico')}
-                    onPress={() => navigation.navigate('DadosServicos')}
+                    onPress={() => navigation.navigate('DadosServicos', {roteiro})}
                 />
                 <ScreenCard 
                     icon="arrow-back" 

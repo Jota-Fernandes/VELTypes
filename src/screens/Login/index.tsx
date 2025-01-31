@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 
-import { Text, Pressable, Alert } from 'react-native';
+import { Text, Pressable, Alert, ScrollView } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
 
 import bg_image from '@assets/bg_evolucao.jpg';
@@ -74,7 +74,7 @@ export default function Login() {
 
   return (
     <Container>
-
+    <ScrollView>
       <Logo source={bg_image}/>
       <Form>
         <SubForm>
@@ -154,6 +154,7 @@ export default function Login() {
           </Text>
         </Pressable>
       </LanguageContainer>
+      </ScrollView>
     </Container>
   );
 }

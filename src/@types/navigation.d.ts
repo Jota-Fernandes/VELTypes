@@ -1,7 +1,9 @@
+import { ParamListBase } from "@react-navigation/native";
+
 export declare global {
     namespace ReactNavigation {
-        interface RootParamList {
-            RoteiroMenu: undefined;
+        interface RootParamList extends ParamListBase{
+            RoteiroMenu: { roteiro: RoteiroSchemaType };
             Servicos: undefined;
             Avistamentos: undefined;
             MenuArmadilhas: undefined;

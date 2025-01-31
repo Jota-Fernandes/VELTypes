@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useContext, useCallback } from "react";
+import { RoteirosContext } from "src/context/RoteirosContext";
 import { FlatList, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
@@ -8,8 +9,9 @@ import { ScreenCard } from "@components/ServiceCard";
 
 import { Container, Title, TextTitle, Icon } from "./styles";
 
+
 export function Servicos() {
-    const [roteiro, setRoteiro] = useState(['teste', 'teste2', 'teste3' ]);
+    const {roteiros, loadRoteiros} = useContext(RoteirosContext)
 
     const {t} = useTranslation();
 
@@ -24,13 +26,13 @@ export function Servicos() {
                 </TextTitle>
             </Title>
             <FlatList
-                data={roteiro}
-                keyExtractor={item => item}
+                data={roteiros}
+                keyExtractor={item => item.roteiro_de_servico_id}
                 renderItem={(item) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('RoteiroMenu')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('RoteiroMenu', {roteiro: item.item})}>
                         <ScreenCard
-                            title="55 - VLI TIPLAM"
-                            subtitle="RODOVIA CONEGO DOMENICO RANGONI"
+                            title={item.item.nome_cliente}
+                            subtitle={item.item.endereco}
                         />
                     </TouchableOpacity>
                 )}
@@ -40,7 +42,7 @@ export function Servicos() {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={[
                     { paddingBottom: 100 },
-                    roteiro.length === 0 && { flex: 1 }
+                    roteiros.length === 0 && { flex: 1 }
                 ]}
             />
         </Container>

@@ -8,6 +8,8 @@ type User = {
     login: string;
     password: string;
     token?: string;
+    replica: string;
+    sistema: string;
 };
 
 type AuthContextType = {
@@ -18,9 +20,8 @@ type AuthContextType = {
     handleLogin: (login: string, password: string, replica: string) => void;
 };
 
-// Definindo o contexto corretamente
 export const AuthContext = createContext<AuthContextType>({ 
-    user: { id: "", login: "", password: "", token: "" }, 
+    user: { id: "", login: "", password: "", token: "", replica:"", sistema:"" }, 
     setUser: () => {}, 
     signed: false, 
     setSigned: () => {}, 
@@ -37,29 +38,52 @@ export function AuthProvider({ children }: AuthProviderProps) {
         id: "",
         login: "",
         password: "",
-        token: ""
+        token: "",
+        replica: "",
+        sistema: ""
     });
     const [signed, setSigned] = useState(false);
 
 //Sincronizar os dados do banco
     async function fetchUsers() {
         const realm = await getRealm()
+
         try{
-            const response = realm.objects('Auth')
-            
-            if(response.length > 0){
+
+            if(!realm.isClosed){
+                const response = realm.objects('Auth')
+                console.log('response:', Array.from(response))
+
                 setSigned(true)
+                if (response.length > 0) {
+                    const firstUser = response[0]; // Pegando o primeiro usuário
+                    setUser({
+                        id: String(firstUser._id),  // Garantindo que seja string
+                        login: String(firstUser.login),
+                        password: String(firstUser.password),
+                        token: firstUser.token ? String(firstUser.token) : "",
+                        replica: String(firstUser.replica),
+                        sistema: String(firstUser.sistema),
+                    });
+                    setSigned(true);
+                }
+            } else {
+                console.error("Erro: A instância do Realm está fechada.");
+
             }
+            
         } catch(error){
             console.error('fetchUsers', error)
-        } finally{
-            realm.close()
         }
     }
 
-//Salva os dados de login no banco
     async function saveDataUser(userData: AuthSchemaType){
         const realm = await getRealm();
+
+        if (!realm || realm.isClosed) {
+            console.error("Erro: A instância do Realm não foi aberta corretamente.");
+            return;
+        }
 
         try{
             realm.write(() =>{
@@ -72,15 +96,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     sistema: userData.sistema
                 });
             })
+
+            setUser({
+                id: userData._id,
+                login: userData.login,
+                password: userData.password,
+                token: userData.token,
+                replica: userData.replica,
+                sistema: userData.sistema
+            })
             
         } catch(error){
             console.error('saveDataUser: ',error)
-        } finally{
-            realm.close()
         }
     }
 
-//Lida com o login e salva os dados no banco   
     async function handleLogin(login: string, password: string, replica: string) {
         const apiAuth = new AuthApi(replica)
 
@@ -96,16 +126,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 sistema: response.data.sistema_id
             });
 
-            setSigned(true)
-
         } catch(error){
-            console.error(error)
+            console.error('handleLogin', error)
         }
     }
 
     useEffect(() => {
         fetchUsers()
-    }, [])
+
+    }, []);
 
     return (
         <AuthContext.Provider 

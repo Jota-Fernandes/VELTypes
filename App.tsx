@@ -4,6 +4,7 @@ import { ThemeProvider } from "styled-components/native";
 import theme from "./src/theme";
 
 import { AuthProvider } from "src/context/AuthContext";
+import { RoteiroProvider } from "src/context/RoteirosContext";
 
 import { Routes } from "@routes/index";
 
@@ -12,12 +13,13 @@ export default function App() {
     
     <ThemeProvider theme={theme}>
       <AuthProvider>
-
-        <Routes/>
-        <StatusBar
-          barStyle="light-content"
-          backgroundColor="black"
-        />      
+        <RoteiroProvider>
+          <Routes/>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="black"
+          />      
+        </RoteiroProvider>
       </AuthProvider>
     </ThemeProvider>
   );

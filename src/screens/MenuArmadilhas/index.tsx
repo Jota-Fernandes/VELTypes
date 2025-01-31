@@ -1,14 +1,36 @@
 import { FlatList, TouchableOpacity } from "react-native";
 import {MaterialIcons} from '@expo/vector-icons' 
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 
 import { HeaderScreen } from "@components/Header";
 
 import { Container, Content, Heading, Row, Cell } from "./styles";
+import { useEffect, useState } from "react";
+
+type MenuArmadilhaRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
 export function MenuArmadilhas() {
-
+    const route = useRoute<MenuArmadilhaRouteProp>();
+    const {roteiro} = route.params;
     const navigation = useNavigation();
+    
+    const [armadilhas, setArmadilhas] = 
+        useState<Array<{numero_armadilha: string; tipo_armadilha: string; local: string, armadilha_id: string }>>([]);
+    
+    useEffect(() => {
+        if (roteiro && roteiro.armadilhas) {
+
+            // Mapear os dados das armadilhas para o formato do FlatList
+            const listaArmadilhas = roteiro.armadilhas.map((item: any, index: number) => ({
+                numero_armadilha: item.numero_armadilha, 
+                tipo_armadilha: item.nome_tipo_de_armadilha, 
+                local: item.desc_armadilha,
+                id: `${item.armadilha_id}-${item.tipo_armadilha}`
+            }));
+
+            setArmadilhas(listaArmadilhas);
+        }
+    }, [roteiro]);
 
     return(
         <Container>
@@ -19,18 +41,13 @@ export function MenuArmadilhas() {
                 <Heading>Local</Heading>
             </Content>
             <FlatList
-                data={[
-                    {key: '1', name: 'PIP ', local: 'Local 1'},
-                    {key: '2', name: 'ARAN', local: 'Local 2'},
-                    {key: '3', name: 'PAL', local: 'Local 3'},
-                    {key: '4', name: 'ESP', local: 'Local 4'},
-                ]}
-                keyExtractor={(item) => item.key} 
+                data={armadilhas}
+                keyExtractor={(item) => item.armadilha_id} 
                 renderItem={({item}) => (
                     <TouchableOpacity onPress={() => navigation.navigate('Armadilha')}>
                         <Row>
-                            <Cell style={{width: '30%'}}>{item.key}</Cell>
-                            <Cell style={{width: '35%'}}>{item.name}</Cell>
+                            <Cell style={{width: '30%'}}>{item.numero_armadilha}</Cell>
+                            <Cell style={{width: '35%'}}>{item.tipo_armadilha}</Cell>
                             <Cell style={{width: '35%'}}>{item.local}</Cell>
                         </Row>
                     </TouchableOpacity>

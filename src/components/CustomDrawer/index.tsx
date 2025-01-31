@@ -1,10 +1,13 @@
 import { TouchableOpacity, View, Text, SafeAreaView, Image } from "react-native"
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer'
+import { useContext } from "react"
+import { RoteirosContext } from "src/context/RoteirosContext"
 
 import { styles } from './styles'
 
 
 export function CustomDrawerContent(props : any){
+    const {sincronizar} = useContext(RoteirosContext)
 
     return(
         <SafeAreaView style={{flex: 1, padding: 0}}>
@@ -22,7 +25,7 @@ export function CustomDrawerContent(props : any){
                     flexDirection: 'column',
                     flex: 1
                 }}>
-                <TouchableOpacity style={styles.SyncButton}>
+                <TouchableOpacity onPress={sincronizar} style={styles.SyncButton}>
                     <Text style={styles.SyncButtonText}>SINCRONIZAR</Text>
                 </TouchableOpacity>
             </View>
