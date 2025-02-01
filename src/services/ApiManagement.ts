@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getRealm } from 'src/database/realm';
 
 class ApiManagement{
     public _user: { login: string; password: string; id: string; replica: string; token?: string;};
@@ -30,6 +31,16 @@ class ApiManagement{
       try {
             const newUser = await this.axios().get(`/login/Login?login=${this._user.login}&senha=${this._user.password}`);
 
+            const realm = await getRealm();
+            realm.write(() => {
+                const item = realm.objectForPrimaryKey('Auth', this._user.id);
+                if(item){
+                    item.token = newUser.data.token;
+                    console.log('novo token salvo', item.token);
+                }
+            })
+
+            return newUser.data.token
         } catch (error) {
             console.error('RefreshToken ==> ', error);
             return error;

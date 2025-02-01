@@ -23,24 +23,24 @@ export function RoteiroMenu(){
                 <ScreenCard 
                     icon="visibility" 
                     title={t('avistamentos')}
-                    onPress={() => navigation.navigate('Avistamentos')}
+                    onPress={() => navigation.navigate('Avistamentos', {roteiro} )}
 
                 />
                 <ScreenCard 
                     icon="thumb-down-off-alt" 
                     title={t('nao_conformidades')}
-                    onPress={() => navigation.navigate('NaoConformidades')}
+                    onPress={() => navigation.navigate('NaoConformidades', {roteiro})}
                 />
                 <ScreenCard 
                     icon="thumb-up-off-alt" 
                     title={t('baixar_nao_conformidades')}
-                    onPress={() => navigation.navigate('BaixaNaoConformidades')}
+                    onPress={() => navigation.navigate('BaixaNaoConformidades', {roteiro})}
 
                 />
                 <ScreenCard 
                     icon="fire-extinguisher" 
                     title={t('produtos_por_areas')}
-                    onPress={() => navigation.navigate('ProdutosPorArea')}
+                    onPress={() => navigation.navigate('ProdutosPorArea', {roteiro})}
                 />
                 <ScreenCard 
                     icon="description" 

@@ -1,11 +1,13 @@
 import { Container } from "./styles";
 import { HeaderScreen } from "@components/Header";
 import { DropdownComponent } from "@components/Dropdown";
-
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { Button } from "@components/Button";
 import { ButtonForm } from "@components/Button/styles";
 import { DataTable } from "@components/DataTable";
+import { useState, useEffect } from "react";
 
+type ProdutosAreaRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
 const data = [
     { label: 'Item 1', value: '1' },
@@ -17,6 +19,28 @@ const data = [
 ]
 
 export function ProdutosPorArea() {
+    const [areas, setAreas] = 
+        useState<Array<{
+            area_id: string; 
+            desc_area: string;
+        }>>([]);
+    const route = useRoute<ProdutosAreaRouteProp>();
+    const navigation = useNavigation();
+
+    const {roteiro} = route.params
+
+    useEffect(() => {
+        if (roteiro && roteiro.areas) {
+
+            const listAreas = roteiro.areas.map((item: any, index: number) => ({
+                id: item.area_id,
+                desc_area: item.desc_area,
+            }));
+
+            setAreas([{ id: '', desc_area: 'Áreas' }, ...listAreas]);
+        }
+    }, [roteiro]);
+
     return (
         <Container>
             <HeaderScreen title="Produtos por Área" />
@@ -29,7 +53,7 @@ export function ProdutosPorArea() {
                 label="Produtos"
             />
             <DropdownComponent 
-                data={data} 
+                data={areas.map(area => ({ label: area.desc_area, value: area.area_id }))} 
                 label="Áreas"
             />
             <DropdownComponent 
@@ -43,7 +67,11 @@ export function ProdutosPorArea() {
             />
             <DataTable />
             <ButtonForm>
-                <Button title="Cancelar" type="SECONDARY" />
+                <Button 
+                    title="Voltar" 
+                    type="SECONDARY" 
+                    onPress={()=> navigation.goBack()}
+                />
                 <Button title="Finalizar" type="TERTIARY"/>
             </ButtonForm>
         </Container>

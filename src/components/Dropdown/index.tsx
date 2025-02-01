@@ -12,20 +12,8 @@ export const DropdownComponent = ({data, label} : Props) => {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
 
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: '#3A797A' }]}>
-          {label}
-        </Text>
-      );
-    }
-    return null;
-  };
-
   return (
     <View style={styles.container}>
-      {renderLabel()}
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: '#3A797A' }]}
         placeholderStyle={styles.placeholderStyle}
@@ -38,7 +26,7 @@ export const DropdownComponent = ({data, label} : Props) => {
         labelField="label"
         valueField="value"
         placeholder={!isFocus ? `${label}` : '...'}
-        searchPlaceholder="Search..."
+        searchPlaceholder="Procure..."
         value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}

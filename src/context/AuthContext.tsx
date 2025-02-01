@@ -49,12 +49,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const realm = await getRealm()
 
         try{
-
             if(!realm.isClosed){
                 const response = realm.objects('Auth')
                 console.log('response:', Array.from(response))
 
-                setSigned(true)
                 if (response.length > 0) {
                     const firstUser = response[0]; // Pegando o primeiro usuário
                     setUser({
@@ -105,7 +103,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 replica: userData.replica,
                 sistema: userData.sistema
             })
-            
+            setSigned(true)
         } catch(error){
             console.error('saveDataUser: ',error)
         }
@@ -133,7 +131,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     useEffect(() => {
         fetchUsers()
-
     }, []);
 
     return (

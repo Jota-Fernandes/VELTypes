@@ -1,6 +1,7 @@
 import { FlatList, TouchableOpacity } from "react-native";
 import {MaterialIcons} from '@expo/vector-icons' 
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import uuid from 'react-native-uuid'
 
 import { HeaderScreen } from "@components/Header";
 
@@ -15,7 +16,12 @@ export function MenuArmadilhas() {
     const navigation = useNavigation();
     
     const [armadilhas, setArmadilhas] = 
-        useState<Array<{numero_armadilha: string; tipo_armadilha: string; local: string, armadilha_id: string }>>([]);
+        useState<Array<{
+            numero_armadilha: string; 
+            tipo_armadilha: string; 
+            local: string, 
+            armadilha_id: string 
+        }>>([]);
     
     useEffect(() => {
         if (roteiro && roteiro.armadilhas) {
@@ -25,7 +31,7 @@ export function MenuArmadilhas() {
                 numero_armadilha: item.numero_armadilha, 
                 tipo_armadilha: item.nome_tipo_de_armadilha, 
                 local: item.desc_armadilha,
-                id: `${item.armadilha_id}-${item.tipo_armadilha}`
+                id: uuid.v4() as string
             }));
 
             setArmadilhas(listaArmadilhas);
@@ -54,9 +60,15 @@ export function MenuArmadilhas() {
                 )}
                 />
             <Content type="FOOTER">
-                <MaterialIcons name="arrow-back" size={33} color="#ffffff" />
-                <MaterialIcons name="map" size={33} color="#ffffff" />
-                <MaterialIcons name="qr-code-scanner" size={33} color="#ffffff" />
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <MaterialIcons name="arrow-back" size={33} color="#ffffff" />
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <MaterialIcons name="map" size={33} color="#ffffff" />
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <MaterialIcons name="qr-code-scanner" size={33} color="#ffffff" />
+                </TouchableOpacity>
             </Content>
         </Container>
     )

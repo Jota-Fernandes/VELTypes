@@ -17,15 +17,16 @@ class RoteirosApi extends ApiManagement {
     
             return request;
         } catch (error) {
-            console.error('RoteirosAPI - Erro na requisição:', error);
-    
             const axiosError = error as AxiosError;
             if (axiosError.response) {
                 switch (axiosError.response.status) {
                     case 401:
                         console.log('RoteirosAPI - Token expirado, renovando token');
-                        this.refreshToken();
-                        return this.getRoteiros(); // Retorna a nova promessa
+                        const newToken = await this.refreshToken();
+                        if (newToken) {
+                            this._user.token = newToken;
+                            return this.getRoteiros();
+                        }
                     default:
                         console.error('RoteirosAPI - Outro erro', axiosError.message);
                 }

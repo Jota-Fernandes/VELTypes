@@ -3,6 +3,9 @@ import RoteirosApi from "src/services/roteiro/RoteirosAPI";
 import { AuthContext } from "./AuthContext";
 import { getRealm } from "src/database/realm";
 import { RoteiroSchemaType } from "src/database/schemas/RoteiroSchema";
+import { SecondGeneralDataType, GeneralDataType } from "src/database/schemas/CheckInSchema";
+import CheckInApi from "src/services/checkIn/CheckInApi";
+import Realm from "realm";
 
 type RoteiroContextType = {
     sincronizar: () => void,
@@ -24,20 +27,17 @@ type RoteiroProviderProps = {
 export function RoteiroProvider({children} : RoteiroProviderProps){
     const [roteiros, setRoteiros] = useState<RoteiroSchemaType[]>([])
     const {user} = useContext(AuthContext)
+    const [generalData, setGeneralData] = useState<GeneralDataType[] | GeneralDataType>([])
 
     async function loadRoteiros(){
-
         try {
-            console.log('entrou no primeiro try')
-    
             const realm = await getRealm();
             
             if(!realm.isClosed){
-                console.log('realm aberto')
 
                 const roteirosData = realm.objects<RoteiroSchemaType>("Roteiro");
         
-                console.log("Roteiros carregados do banco: ", roteirosData); 
+                /* console.log("Roteiros carregados do banco: ", roteirosData);  */
 
                 setRoteiros(Array.from(roteirosData));
                     
@@ -54,7 +54,6 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
         
         const realm = await getRealm();
         try{
-            console.log('saveDataRoteiros aberto o realm')
             realm.write(() => {
                 realm.create('Roteiro', { 
                     acompanhante: roteiroData.acompanhante,
@@ -151,19 +150,125 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
 
         const apiReq = new RoteirosApi(user);
         try{
-
             const response = await apiReq.getRoteiros();
-
             if (response && response.data) {
                 return response.data.roteiros; // Acessa diretamente os dados esperados
             }
-
            
         } catch(error){
             console.error('Request roteiros ==> ', error)
         }
 
         return undefined
+    }
+    async function loadGeneralData(){
+        try {
+            const realm = await getRealm();
+            
+            if(!realm.isClosed){
+
+                const dataSaved = realm.objects<GeneralDataType>("GeneralData");
+            
+                if (dataSaved.length > 0) {
+                    setGeneralData(dataSaved[0])
+                } else {
+                    console.log("Nenhum dado encontrado na coleção 'GeneralData'.");
+                }  
+    
+            } else{
+                console.log('realm fechado')
+            }
+        } catch (error) {
+            console.error("Erro ao carregar roteiros:", error);
+        }
+    };
+
+    async function saveGeneralData(generalData: GeneralDataType) {
+        const realm = await getRealm();
+        
+        try {
+            realm.write(() => {
+                realm.create("GeneralData", {
+                    id: "1",
+                    AcaoArm: generalData.acao_arm.map(acao => ({
+                        acao_id: acao.acao_id,
+                        desc_acao: acao.desc_acao,
+                        gera_consumo: acao.gera_consumo,
+                        num_elem: acao.num_elem
+                    })),
+                    Condicoes: generalData.condicoes.map(condicao => ({
+                        condicao_id: condicao.condicao_id,
+                        sigla_condicao: condicao.sigla_condicao
+                    })),
+                    Equiptos: generalData.equiptos.map(equipto => ({
+                        equipto_id: equipto.equipto_id,
+                        desc_equipto: equipto.desc_equipto
+                    })),
+                    MedidasCorretivas: generalData.medidas_corretivas.map(mc => ({
+                        mc_id: mc.mc_id,
+                        desc_mc: mc.desc_mc
+                    })),
+                    NaoConformidades: generalData.nao_conformidades.map(nc => ({
+                        nc_id: nc.nc_id,
+                        desc_nc: nc.desc_nc
+                    })),
+                    NiveisDeHigiene: generalData.niveis_de_higiene.map(nivel => ({
+                        nivel_higiene_id: nivel.nivel_higiene_id,
+                        sigla_nivel_de_higiene: nivel.sigla_nivel_de_higiene
+                    })),
+                    Ocorrencias: generalData.ocorrencias.map(oco => ({
+                        oco_id: oco.oco_id,
+                        desc_oco: oco.desc_oco,
+                        praga_id: oco.praga_id
+                    })),
+                    Pragas: generalData.pragas.map(praga => ({
+                        praga_id: praga.praga_id,
+                        desc_praga: praga.desc_praga
+                    })),
+                    StatusArm: generalData.status_arm.map(status => ({
+                        status_id: status.status_id,
+                        desc_status: status.desc_status,
+                        num_elem: status.num_elem
+                    })),
+                    TiposArm: generalData.tipos_arm.map(tipo => ({
+                        tipo_id: tipo.tipo_id,
+                        desc_tipo: tipo.desc_tipo,
+                        sigla_tipo: tipo.sigla_tipo,
+                        elem1: tipo.elem1,
+                        elem2: tipo.elem2,
+                        elem3: tipo.elem3,
+                        elem4: tipo.elem4,
+                        elem5: tipo.elem5,
+                        elem6: tipo.elem6
+                    })),
+                    Veiculos: generalData.veiculos.map(veiculo => ({
+                        veiculo_id: veiculo.veiculo_id,
+                        desc_veiculo: veiculo.desc_veiculo
+                    }))
+                }, Realm.UpdateMode.All);
+            });
+    
+            console.log("Dados salvos com sucesso!");
+        } catch (error) {
+            console.error("Erro ao salvar dados:", error);
+        } finally{
+            loadGeneralData()
+        }
+    }
+    
+
+    async function requestGeneralData(){
+        const generalData = new CheckInApi(user)
+        try{
+            const response = await generalData.getData();
+
+            if (response && response.data) {
+               /*  console.log(response.data.tabelas); */
+                return response.data.tabelas; // Acessa diretamente os dados esperados
+            }
+        } catch(error){
+            console.error('Request general data ==> ', error)
+        }
     }
 
     async function sincronizar(){
@@ -175,6 +280,11 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
                 saveDataRoteiros(roteirosSynced);
             }
 
+            const generalDataSynced = await requestGeneralData()
+            if(generalDataSynced){
+                saveGeneralData(generalDataSynced);
+            }
+
         } catch(error){
             console.error('Sincronizar roteiros ==> ', error)
         } finally{
@@ -184,6 +294,8 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
 
     useEffect(() => {
         loadRoteiros();
+        loadGeneralData();
+
     },[])
 
     return(

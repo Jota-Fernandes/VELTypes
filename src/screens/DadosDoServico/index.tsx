@@ -6,6 +6,7 @@ import { Button } from "@components/Button";
 import { ButtonForm } from "@components/Button/styles";
 import {useRoute, RouteProp} from "@react-navigation/native"
 import { ScrollView } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 type DadosServicoRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
@@ -19,7 +20,8 @@ const data = [
 ]
 
 export function DadosServicos() {
-
+    
+    const navigation = useNavigation();
     const route = useRoute<DadosServicoRouteProp>();
     const {roteiro} = route.params;
 
@@ -30,7 +32,6 @@ export function DadosServicos() {
         \n${roteiro.endereco}
         `
     }
-
 
     return (
         <Container>
@@ -60,7 +61,8 @@ export function DadosServicos() {
                 <ButtonForm>
                     <Button 
                         title="Voltar" 
-                        type="SECONDARY" 
+                        type="SECONDARY"
+                        onPress={() => navigation.goBack()}
                     />
                     <Button 
                         title="Salvar" 

@@ -4,10 +4,16 @@ import { PhotoPhorm } from "@components/PhotoPhorm";
 import { ButtonForm } from "@components/Button/styles";
 import { Button } from "@components/Button";
 import { DataTable  } from "@components/DataTable";
+import { useNavigation } from "@react-navigation/native";
+import { useRoute, RouteProp } from "@react-navigation/native";
 
 import { Container } from "./styles";
+import { useEffect, useState } from "react";
+
+type AvistamentoRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
 const data = [
+    { label: 'Ocorrências', value: '0' },
     { label: 'Item 1', value: '1' },
     { label: 'Item 2', value: '2' },
     { label: 'Item 3', value: '3' },
@@ -17,6 +23,27 @@ const data = [
 ]
 
 export function Avistamentos() {
+    const [areas, setAreas] = 
+    useState<Array<{
+        area_id: string; 
+        desc_area: string;
+    }>>([]);
+    const route = useRoute<AvistamentoRouteProp>();
+    const {roteiro} = route.params;
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        if (roteiro && roteiro.areas) {
+
+            const listAreas = roteiro.areas.map((item: any, index: number) => ({
+                id: item.area_id,
+                desc_area: item.desc_area,
+            }));
+
+            setAreas([{ id: '', desc_area: 'Áreas' }, ...listAreas]);
+        }
+    }, [roteiro]);
+
     return (
         <Container>
             <HeaderScreen title="Avistamentos" />
@@ -25,8 +52,8 @@ export function Avistamentos() {
                 label="Ocorrências" 
             />
             <DropdownComponent 
-                data={data} 
-                label="Áreas" 
+                data={areas.map(area => ({ label: area.desc_area, value: area.area_id }))}  
+                label="Áreas"
             />
             <PhotoPhorm title="Fotos dos avistamentos" />
 
@@ -41,6 +68,7 @@ export function Avistamentos() {
                 <Button 
                     title="Voltar" 
                     type="SECONDARY"
+                    onPress={()=> navigation.goBack()}
                 />
 
                 <Button 
