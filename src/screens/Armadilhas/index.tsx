@@ -2,7 +2,7 @@ import { ScrollView } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { Input } from "@components/Input";
 import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
-
+import { useNavigation } from "@react-navigation/native";
 import { DropdownComponent } from "@components/Dropdown";
 import { PhotoPhorm } from "@components/PhotoPhorm";
 import {Button} from "@components/Button";
@@ -20,6 +20,9 @@ const data = [
 ]
 
 export function Armadilha(){
+
+    const navigation = useNavigation();
+
     return(
         <Container>
             <ScrollView>
@@ -84,6 +87,7 @@ export function Armadilha(){
                 />
                 <ButtonForm>
                     <Button
+                        onPress={() => navigation.goBack() }
                         title="Voltar"
                         type="SECONDARY"
                     />

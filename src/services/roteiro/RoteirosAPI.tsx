@@ -35,6 +35,112 @@ class RoteirosApi extends ApiManagement {
             }
         }
     }
+
+    async sendRoteiros(roteiro: any) {
+/*         return await Promise.all(
+          roteiro.map(async servico => {
+            const idServico = servico.roteiro_de_servico_id;
+    
+            const data = [
+              {
+                roteiro_de_servico_id: idServico,
+                token: this._user.token,
+                packages:
+                  servico.armadilhas.length === 0 ? 1 : servico.armadilhas.length,
+                type: 'armadilhas',
+                data: servico.armadilhas,
+              },
+              {
+                roteiro_de_servico_id: idServico,
+                token: this._user.token,
+                packages: servico.reg_oco.length === 0 ? 1 : servico.reg_oco.length,
+                type: 'reg_oco',
+                data: servico.reg_oco,
+              },
+              {
+                roteiro_de_servico_id: idServico,
+                token: this._user.token,
+                packages:
+                  servico.reg_prod_area.length === 0
+                    ? 1
+                    : servico.reg_prod_area.length,
+                type: 'reg_prod_area',
+                data: servico.reg_prod_area,
+              },
+              {
+                roteiro_de_servico_id: idServico,
+                token: this._user.token,
+                packages: servico.reg_nc.length === 0 ? 1 : servico.reg_nc.length,
+                type: 'reg_nc',
+                data: servico.reg_nc,
+              },
+              {
+                roteiro_de_servico_id: idServico,
+                token: this._user.token,
+                packages: servico.foto_os.length === 0 ? 1 : servico.foto_os.length,
+                type: 'foto_os',
+                data: servico.foto_os,
+              },
+            ];
+    
+            const header = {
+              roteiro_de_servico_id: idServico,
+              token: this._user.token,
+              type: 'header',
+              data: Object.assign({}, servico),
+            };
+    
+            data.forEach(key => delete header.data[key.type]);
+    
+            header.charsCount = JSON.stringify(header.data).length;
+    
+            return await this.axios()
+              .post('mobile/servicosExecutados', header)
+              .then(async () => {
+                return await Promise.all(
+                  data.map(async pkg => {
+                    if (pkg.packages === 1) {
+                      pkg.charsCount = JSON.stringify(pkg.data).length;
+    
+                      return await this.axios()
+                        .post('mobile/servicosExecutados', pkg)
+                        .catch(Promise.reject);
+                    } else {
+                      return await Promise.all(
+                        pkg.data.map(async (subpkg, index) => {
+                          const toSend = {
+                            roteiro_de_servico_id: pkg.roteiro_de_servico_id,
+                            token: pkg.token,
+                            type: pkg.type,
+                            packages: pkg.packages,
+                            packageId: index + 1,
+                            data: subpkg,
+                            charsCount: JSON.stringify(subpkg).length,
+                          };
+    
+                          return await this.axios()
+                            .post('mobile/servicosExecutados', toSend)
+                            .catch(Promise.reject);
+                        }),
+                      ).catch(Promise.reject);
+                    }
+                  }),
+                );
+              })
+              .then(async () => {
+                return await this.axios()
+                  .post('mobile/processaServicos', {
+                    token: this._user.token,
+                    roteiro_de_servico_id: servico.roteiro_de_servico_id,
+                  })
+                  .catch(Promise.reject);
+              })
+              .catch(Promise.reject);
+          }),
+        ).catch(error => {
+          throw error;
+        });*/
+      } 
 }
 
 export default RoteirosApi

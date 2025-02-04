@@ -3,8 +3,7 @@ import styled from "styled-components/native";
 import { DefaultTheme } from "styled-components/native";
 
 export const Container = styled.View`
-    margin-right: 10px;
-    margin-left: 10px;
+   
 `
 
 export const Content = styled.View`
@@ -32,13 +31,13 @@ export const Row = styled.View`
     max-height: 80px;
     padding: 10px;
     background-color: ${({theme} : DefaultTheme) => theme.COLORS.WHITE};
-    border: 1px ${({theme} : DefaultTheme) => theme.COLORS.GRAY_50};
+    border: 1px;
+    align-items: center;
 `
 
 export const Cell = styled.Text`
     font-family: ${({theme} : DefaultTheme) => theme.FONT_FAMILY.REGULAR};
-    color: ${({theme} : DefaultTheme) => theme.COLORS.BLACK};
+    color: ${({theme} : DefaultTheme) => theme.COLORS.GRAY_500_MUTED};
     font-size: 15px;
-    text-align: left;
-
+    margin-right: 10px;
 `

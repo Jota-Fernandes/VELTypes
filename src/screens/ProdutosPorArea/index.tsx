@@ -24,10 +24,25 @@ export function ProdutosPorArea() {
             area_id: string; 
             desc_area: string;
         }>>([]);
+    const [equiptos, setEquiptos] = 
+    useState<Array<{
+        equipto_id: string; 
+        desc_equipto: string;
+    }>>([]);
+    const [pragas, setPragas] = 
+    useState<Array<{
+        praga_id: string; 
+        desc_praga: string;
+    }>>([]);
+    const [produtos, setProdutos] = 
+    useState<Array<{
+        nome_prod: string; 
+        prod_id: string;
+    }>>([]);
     const route = useRoute<ProdutosAreaRouteProp>();
     const navigation = useNavigation();
 
-    const {roteiro} = route.params
+    const {roteiro, generalData} = route.params
 
     useEffect(() => {
         if (roteiro && roteiro.areas) {
@@ -36,20 +51,42 @@ export function ProdutosPorArea() {
                 id: item.area_id,
                 desc_area: item.desc_area,
             }));
-
             setAreas([{ id: '', desc_area: 'Áreas' }, ...listAreas]);
+
+            const listProdutos = roteiro.produtos.map((item: any, index: number) => ({
+                prod_id: item.prod_id,
+                nome_prod: item.nome_prod,
+            }));
+
+            setProdutos([{ prod_id: '', nome_prod: 'Produtos' }, ...listProdutos]);
         }
-    }, [roteiro]);
+
+        if(generalData){
+            const listPragas = generalData.Pragas.map((item: any, index: number) => ({
+                praga_id: item.praga_id,
+                desc_praga: item.desc_praga,
+            }));
+            setPragas([{ praga_id: '', desc_praga: 'Pragas' }, ...listPragas]);
+
+            const listEquiptos = generalData.Equiptos.map((item: any, index: number) => ({
+                equipto_id: item.equipto_id,
+                desc_equipto: item.desc_equipto,
+            }));
+            setEquiptos([{ equipto_id: '', desc_equipto: 'Equipamento' }, ...listEquiptos]);
+
+          
+        }
+    }, [roteiro, generalData]);
 
     return (
         <Container>
             <HeaderScreen title="Produtos por Área" />
             <DropdownComponent 
-                data={data} 
+                data={pragas.map(praga => ({ label: praga.desc_praga, value: praga.praga_id }))} 
                 label="Pragas"
             />
             <DropdownComponent 
-                data={data} 
+                data={produtos.map(produto => ({ label: produto.nome_prod, value: produto.prod_id }))} 
                 label="Produtos"
             />
             <DropdownComponent 
@@ -57,7 +94,7 @@ export function ProdutosPorArea() {
                 label="Áreas"
             />
             <DropdownComponent 
-                data={data} 
+                data={equiptos.map(equipto => ({ label: equipto.desc_equipto, value: equipto.equipto_id }))} 
                 label="Equipamentos"
             />
 

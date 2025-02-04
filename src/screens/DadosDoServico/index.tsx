@@ -7,6 +7,7 @@ import { ButtonForm } from "@components/Button/styles";
 import {useRoute, RouteProp} from "@react-navigation/native"
 import { ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useState, useEffect } from "react";
 
 type DadosServicoRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
@@ -23,7 +24,11 @@ export function DadosServicos() {
     
     const navigation = useNavigation();
     const route = useRoute<DadosServicoRouteProp>();
-    const {roteiro} = route.params;
+    const {roteiro, generalData} = route.params;
+    const [veiculos, setVeiculos] = useState<Array<{
+        veiculo_id: string;
+        desc_veiculo: string;
+    }>>([]);
 
     const dadosServicos = {
         text: `${roteiro.nome_cliente} 
@@ -32,6 +37,17 @@ export function DadosServicos() {
         \n${roteiro.endereco}
         `
     }
+
+    useEffect(() => {
+
+        if(generalData){
+            const listVeiculos = generalData.Veiculos.map((item: any, index: number) => ({
+                veiculo_id: item.veiculo_id,
+                desc_veiculo: item.desc_veiculo,
+            }));
+            setVeiculos([{ veiculo_id: '', desc_veiculo: 'Veículos' }, ...listVeiculos]);
+        }
+    },[generalData])
 
     return (
         <Container>
@@ -49,7 +65,9 @@ export function DadosServicos() {
                 <Content>
                     <Text>{roteiro.descricao_servicos}</Text>
                 </Content>
-                <DropdownComponent data={data} label="Veiculos"/>
+                <DropdownComponent 
+                    data={veiculos.map(veiculo => ({ label: veiculo.desc_veiculo, value: veiculo.veiculo_id }))}  
+                    label="Veiculos"/>
 
                 <PhotoPhorm title="Foto da Ordem de Serviço"/>
                 <PhotoPhorm title="Fotos adicionais"/>

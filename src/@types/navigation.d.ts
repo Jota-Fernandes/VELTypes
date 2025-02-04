@@ -1,9 +1,10 @@
 import { ParamListBase } from "@react-navigation/native";
+import { GeneralDataType, SecondGeneralDataType } from "src/database/schemas/CheckInSchema";
 
 export declare global {
     namespace ReactNavigation {
         interface RootParamList extends ParamListBase{
-            RoteiroMenu: { roteiro: RoteiroSchemaType };
+            RoteiroMenu: { roteiro: RoteiroSchemaType, generalData: SecondGeneralDataType };
             Servicos: undefined;
             Avistamentos: undefined;
             MenuArmadilhas: undefined;

@@ -6,9 +6,10 @@ import {styles} from './styles';
 type Props = {
     data: any;
     label: string;
+    onSelect: (value: string) => void;
 }
 
-export const DropdownComponent = ({data, label} : Props) => {
+export const DropdownComponent = ({data, label, onSelect} : Props) => {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
 
@@ -33,6 +34,7 @@ export const DropdownComponent = ({data, label} : Props) => {
         onChange={item => {
           setValue(item.value);
           setIsFocus(false);
+          onSelect(item.label);
         }}
       />
     </View>

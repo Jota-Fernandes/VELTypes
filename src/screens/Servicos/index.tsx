@@ -1,4 +1,4 @@
-import { useState, useContext, useCallback } from "react";
+import { useState, useContext, useCallback, useEffect } from "react";
 import { RoteirosContext } from "src/context/RoteirosContext";
 import { FlatList, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -11,7 +11,7 @@ import { Container, Title, TextTitle, Icon } from "./styles";
 
 
 export function Servicos() {
-    const {roteiros, loadRoteiros} = useContext(RoteirosContext)
+    const {roteiros, generalData} = useContext(RoteirosContext)
 
     const {t} = useTranslation();
 
@@ -29,7 +29,7 @@ export function Servicos() {
                 data={roteiros}
                 keyExtractor={item => item.roteiro_de_servico_id}
                 renderItem={(item) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('RoteiroMenu', {roteiro: item.item})}>
+                    <TouchableOpacity onPress={() => navigation.navigate('RoteiroMenu', {roteiro: item.item, generalData})}>
                         <ScreenCard
                             title={item.item.nome_cliente}
                             subtitle={item.item.endereco}

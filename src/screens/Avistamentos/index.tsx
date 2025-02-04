@@ -28,8 +28,13 @@ export function Avistamentos() {
         area_id: string; 
         desc_area: string;
     }>>([]);
+    const [ocorrencias, setOcorrencias] = 
+    useState<Array<{
+        oco_id: string; 
+        desc_oco: string;
+    }>>([]);
     const route = useRoute<AvistamentoRouteProp>();
-    const {roteiro} = route.params;
+    const {roteiro, generalData} = route.params;
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -42,13 +47,22 @@ export function Avistamentos() {
 
             setAreas([{ id: '', desc_area: 'Áreas' }, ...listAreas]);
         }
-    }, [roteiro]);
+
+        if(generalData){
+            const listOcorrencias = generalData.Ocorrencias.map((item: any, index: number) => ({
+                oco_id: item.oco_id,
+                desc_oco: item.desc_oco,
+            }));
+            setOcorrencias([{ oco_id: '', desc_oco: 'Não Conformidade' }, ...listOcorrencias]);
+
+        }
+    }, [roteiro, generalData]);
 
     return (
         <Container>
             <HeaderScreen title="Avistamentos" />
             <DropdownComponent 
-                data={data} 
+                data={ocorrencias.map(oco => ({ label: oco.desc_oco, value: oco.oco_id }))} 
                 label="Ocorrências" 
             />
             <DropdownComponent 

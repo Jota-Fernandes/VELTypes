@@ -1,4 +1,4 @@
-import Realm, { schemaVersion } from 'realm';
+import Realm from 'realm';
 import { AuthSchema } from './schemas/AuthSchema';
 import { 
     RoteiroSchema, 
@@ -23,15 +23,13 @@ import {
     TiposArmSchema,
     VeiculosSchema
 } from './schemas/CheckInSchema';
+import { NaoConformidade } from './schemas/TableSchemas';
 
 let realmInstance: Realm | null = null;
 
 export const getRealm = async () => {
-    
-    /* console.log('instancia do realm', realmInstance) */
 
     if (!realmInstance) {
-        /* console.log('criando instancia do realm') */
         realmInstance = await Realm.open({
             path: "database",  // Nome único para o seu banco de dados
             schema: [
@@ -54,7 +52,8 @@ export const getRealm = async () => {
                 StatusArmSchema,
                 TiposArmSchema,
                 VeiculosSchema,
-                GeneralDataSchema
+                GeneralDataSchema,
+                NaoConformidade
             ],
         });
         

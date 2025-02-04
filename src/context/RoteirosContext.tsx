@@ -11,12 +11,14 @@ type RoteiroContextType = {
     sincronizar: () => void,
     roteiros: RoteiroSchemaType[];
     loadRoteiros: () => void;
+    generalData: GeneralDataType[] | GeneralDataType;
 }
 
 export const RoteirosContext = createContext<RoteiroContextType>({
     sincronizar: () => {},
     roteiros: [],
-    loadRoteiros: () => {}
+    loadRoteiros: () => {},
+    generalData: []
 })
 
 type RoteiroProviderProps = {
@@ -36,8 +38,6 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
             if(!realm.isClosed){
 
                 const roteirosData = realm.objects<RoteiroSchemaType>("Roteiro");
-        
-                /* console.log("Roteiros carregados do banco: ", roteirosData);  */
 
                 setRoteiros(Array.from(roteirosData));
                     
@@ -295,7 +295,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
     useEffect(() => {
         loadRoteiros();
         loadGeneralData();
-
+        console.log('general data loaded', generalData)
     },[])
 
     return(
@@ -303,6 +303,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
             value={{
                 sincronizar,
                 roteiros,
+                generalData,
                 loadRoteiros,
             }}
         >

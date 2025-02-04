@@ -41,7 +41,7 @@ export const Title = styled.Text`
     font-family: ${({theme} : DefaultTheme) => theme.FONT_FAMILY.BOLD};
 `
 
-export const ButtonForm = styled.TouchableOpacity`
+export const ButtonForm = styled.View`
     margin: 10px;
     margin-right: 10px;
 
