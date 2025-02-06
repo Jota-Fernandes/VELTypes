@@ -1,24 +1,19 @@
+import { useState, useEffect } from "react";
+
 import { Container } from "./styles";
 import { HeaderScreen } from "@components/Header";
-import { DropdownComponent } from "@components/Dropdown";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { Button } from "@components/Button";
 import { ButtonForm } from "@components/Button/styles";
 import { DataTable } from "@components/DataTable";
-import { useState, useEffect } from "react";
+
+import { DropdownComponent2 } from "@components/Dropdown2"; 
 
 type ProdutosAreaRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
-const data = [
-    { label: 'Item 1', value: '1' },
-    { label: 'Item 2', value: '2' },
-    { label: 'Item 3', value: '3' },
-    { label: 'Item 4', value: '4' },
-    { label: 'Item 5', value: '5' },
-    { label: 'Item 6', value: '6' },
-]
-
 export function ProdutosPorArea() {
+    const route = useRoute<ProdutosAreaRouteProp>();
+    const navigation = useNavigation();
     const [areas, setAreas] = 
         useState<Array<{
             area_id: string; 
@@ -39,10 +34,37 @@ export function ProdutosPorArea() {
         nome_prod: string; 
         prod_id: string;
     }>>([]);
-    const route = useRoute<ProdutosAreaRouteProp>();
-    const navigation = useNavigation();
+    const [selectedPragas, setSelectedPragas] = useState("");
+    const [selectedProdutos, setSelectedProdutos] = useState("");
+    const [selectedArea, setSelectedArea] = useState("");
+    const [selectedEquipamentos, setSelectedEquipamentos] = useState("");
 
     const {roteiro, generalData} = route.params
+
+
+    function handleAddProdutos() {
+        if(!selectedProdutos || !selectedPragas){
+            alert("Preencha todos os campos!");
+            return
+        }
+        
+        const novosProdutos = {
+            id: Date.now().toString(),    // Gerando um ID único
+            roteiro_id: roteiro.roteiro_de_servico_id,  // Criando um ID único
+            area: selectedArea,
+            equipamento: selectedEquipamentos,
+            produto: selectedProdutos,
+            praga: selectedPragas
+        };
+
+      /*   setRenderedItems(prevState => [...prevState, renderOcorrencia(novaOcorrencia)]);
+        setValueRendered([...valueRendered, novaOcorrencia]);
+
+
+        setSelectedArea("");
+        setSelectedOcorrencia(""); */
+    }
+
 
     useEffect(() => {
         if (roteiro && roteiro.areas) {
@@ -81,21 +103,29 @@ export function ProdutosPorArea() {
     return (
         <Container>
             <HeaderScreen title="Produtos por Área" />
-            <DropdownComponent 
-                data={pragas.map(praga => ({ label: praga.desc_praga, value: praga.praga_id }))} 
+            <DropdownComponent2 
+                data={pragas.map(praga => ({ label: praga.desc_praga, value: praga.praga_id }))}
                 label="Pragas"
+                onSelect={setSelectedPragas}
+                value={selectedPragas}
             />
-            <DropdownComponent 
+            <DropdownComponent2 
                 data={produtos.map(produto => ({ label: produto.nome_prod, value: produto.prod_id }))} 
                 label="Produtos"
+                onSelect={setSelectedProdutos}
+                value={selectedProdutos}
             />
-            <DropdownComponent 
+            <DropdownComponent2 
                 data={areas.map(area => ({ label: area.desc_area, value: area.area_id }))} 
                 label="Áreas"
+                onSelect={setSelectedArea}
+                value={selectedArea}
             />
-            <DropdownComponent 
+            <DropdownComponent2 
                 data={equiptos.map(equipto => ({ label: equipto.desc_equipto, value: equipto.equipto_id }))} 
                 label="Equipamentos"
+                onSelect={setSelectedEquipamentos}
+                value={selectedEquipamentos}
             />
 
             <Button 

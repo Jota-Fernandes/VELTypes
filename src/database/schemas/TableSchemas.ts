@@ -2,6 +2,7 @@ import Realm from "realm";
 
 export class NaoConformidade extends Realm.Object<NaoConformidade> {
   id!: string;
+  roteiro_id!: string;
   area!: string;
   nc!: string;
   registrada!: string;

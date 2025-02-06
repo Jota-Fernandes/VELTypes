@@ -1,5 +1,7 @@
 import ApiManagement from "../ApiManagement";
 import { AxiosError, AxiosResponse } from "axios";
+import { RoteiroSchemaType } from "src/database/schemas/RoteiroSchema";
+import TableRepository from "src/Repository/TableRepository";
 
 class RoteirosApi extends ApiManagement {
     constructor(user: { login: string; password: string; id: string; replica: string; token?: string;}){
@@ -36,13 +38,20 @@ class RoteirosApi extends ApiManagement {
         }
     }
 
-    async sendRoteiros(roteiro: any) {
-/*         return await Promise.all(
+    async sendRoteiros(roteiro: RoteiroSchemaType[]) {
+        console.log("roteiro", roteiro)
+        return await Promise.all(
           roteiro.map(async servico => {
             const idServico = servico.roteiro_de_servico_id;
+
+            const tableRep = new TableRepository();
+            
+            const naoConformidadesByRoteiroId = await tableRep.getNaoConformidadesByRoteiroId(idServico);
+
+            console.log("naoConformidadesByRoteiroId", naoConformidadesByRoteiroId)
     
             const data = [
-              {
+/*               {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
                 packages:
@@ -66,31 +75,38 @@ class RoteirosApi extends ApiManagement {
                     : servico.reg_prod_area.length,
                 type: 'reg_prod_area',
                 data: servico.reg_prod_area,
-              },
+              }, */
               {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
-                packages: servico.reg_nc.length === 0 ? 1 : servico.reg_nc.length,
+                packages: naoConformidadesByRoteiroId.length === 0 ? 1 : naoConformidadesByRoteiroId.length,
                 type: 'reg_nc',
-                data: servico.reg_nc,
+                data: naoConformidadesByRoteiroId,
+                charsCount: 0
               },
-              {
+           /*    {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
                 packages: servico.foto_os.length === 0 ? 1 : servico.foto_os.length,
                 type: 'foto_os',
                 data: servico.foto_os,
-              },
+              }, */
             ];
     
             const header = {
               roteiro_de_servico_id: idServico,
               token: this._user.token,
               type: 'header',
-              data: Object.assign({}, servico),
+              data: {...servico},
+              charsCount: 0
             };
-    
-            data.forEach(key => delete header.data[key.type]);
+
+            data.forEach(item => {
+              const key = item.type as keyof typeof header.data;
+              if (key in header.data) {
+                  delete header.data[key];
+              }
+            });
     
             header.charsCount = JSON.stringify(header.data).length;
     
@@ -136,10 +152,10 @@ class RoteirosApi extends ApiManagement {
                   .catch(Promise.reject);
               })
               .catch(Promise.reject);
-          }),
+        }),
         ).catch(error => {
           throw error;
-        });*/
+        });
       } 
 }
 

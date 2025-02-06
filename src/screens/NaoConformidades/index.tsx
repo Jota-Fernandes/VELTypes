@@ -67,8 +67,8 @@ export function NaoConformidades() {
     function toggleSelection(id: string) {
         setSelectedItems(prevSelected => 
             prevSelected.includes(id) 
-                ? prevSelected.filter(itemId => itemId !== id)  // Remove se já estiver selecionado
-                : [...prevSelected, id]  // Adiciona se não estiver selecionado
+                ? prevSelected.filter(itemId => itemId !== id)
+                : [...prevSelected, id]
         );
     }
 
@@ -106,11 +106,9 @@ export function NaoConformidades() {
             prazo: selectedPrazo,
         };
 
-        // Atualiza o estado com o novo item gerado
         setRenderedItems(prevState => [...prevState, renderNaoConformidade(novaNaoConformidade)]);
         setValueRendered([...valueRendered, novaNaoConformidade]);
 
-        // Limpa os campos após adicionar o item
         setSelectedArea("");
         setSelectedNaoConformidade("");
         setSelectedRegistrada("");
@@ -273,33 +271,34 @@ export function NaoConformidades() {
                     onSelect={setSelectedPrazo}
                     value={selectedPrazo}
                 />
-
-                <PhotoPhorm title="Fotos das Não Conformidades"/>
-
-                <Button 
-                    onPress={handleAddNaoConformidade}
-                    title="Adicionar" 
-                    type="PRIMARY"
-                />
-                
                 <ScrollView>
-                    <DataTable onPress={removeRow}/>
-                    {renderedItems}
+                    <PhotoPhorm title="Fotos das Não Conformidades"/>
+
+                    <Button 
+                        onPress={handleAddNaoConformidade}
+                        title="Adicionar" 
+                        type="PRIMARY"
+                    />
+                
+                
+                        <DataTable onPress={removeRow}/>
+                        {renderedItems}
+                    
                 </ScrollView>
+                    <ButtonForm>
+                        <Button 
+                            title="Voltar" 
+                            type="SECONDARY"
+                            onPress={() => navigation.goBack()}
+                        />
 
-                <ButtonForm>
-                    <Button 
-                        title="Voltar" 
-                        type="SECONDARY"
-                        onPress={() => navigation.goBack()}
-                    />
-
-                    <Button 
-                        onPress={handleFinishService} 
-                        title="Finalizar" 
-                        type="TERTIARY"
-                    />
-                </ButtonForm>
+                        <Button 
+                            onPress={handleFinishService} 
+                            title="Finalizar" 
+                            type="TERTIARY"
+                        />
+                    </ButtonForm>
+                
         </Container>
     )
 }

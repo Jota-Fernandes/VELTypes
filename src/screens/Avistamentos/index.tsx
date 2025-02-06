@@ -1,28 +1,25 @@
+import { useEffect, useState } from "react";
 import { HeaderScreen } from "@components/Header";
-import { DropdownComponent } from "@components/Dropdown";
 import { PhotoPhorm } from "@components/PhotoPhorm";
 import { ButtonForm } from "@components/Button/styles";
 import { Button } from "@components/Button";
 import { DataTable  } from "@components/DataTable";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute, RouteProp } from "@react-navigation/native";
+import { DropdownComponent2 } from "@components/Dropdown2";
+import { Input } from "@components/Input";
+import { ScrollView } from "react-native";
 
-import { Container } from "./styles";
-import { useEffect, useState } from "react";
+import { Container, SubForm, Row, Cell } from "./styles";
+import { CustomCheckbox } from "@components/Checkbox";
 
 type AvistamentoRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
-const data = [
-    { label: 'Ocorrências', value: '0' },
-    { label: 'Item 1', value: '1' },
-    { label: 'Item 2', value: '2' },
-    { label: 'Item 3', value: '3' },
-    { label: 'Item 4', value: '4' },
-    { label: 'Item 5', value: '5' },
-    { label: 'Item 6', value: '6' },
-]
-
 export function Avistamentos() {
+    const route = useRoute<AvistamentoRouteProp>();
+    const {roteiro, generalData} = route.params;
+    const navigation = useNavigation();
+
     const [areas, setAreas] = 
     useState<Array<{
         area_id: string; 
@@ -33,9 +30,60 @@ export function Avistamentos() {
         oco_id: string; 
         desc_oco: string;
     }>>([]);
-    const route = useRoute<AvistamentoRouteProp>();
-    const {roteiro, generalData} = route.params;
-    const navigation = useNavigation();
+    const [selectedArea, setSelectedArea] = useState("");
+    const [selectedOcorrencia, setSelectedOcorrencia] = useState("");
+    const now = new Date();
+    const [date, setDate] = useState("");
+    const [time, setTime] = useState("");
+    const [renderedItems, setRenderedItems] = useState<any[]>([]);
+    const [valueRendered, setValueRendered] = useState<any[]>([]);
+
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+    function toggleSelection(id: string) {
+        setSelectedItems(prevSelected => 
+            prevSelected.includes(id) 
+                ? prevSelected.filter(itemId => itemId !== id)
+                : [...prevSelected, id]
+        );
+    }
+
+    function renderOcorrencia(novaOcorrencia: any) {
+        return (
+            <ScrollView horizontal={true} key={novaOcorrencia.id}>
+                <Row>
+                    <CustomCheckbox  onPress={() => toggleSelection(novaOcorrencia.id)}/>
+                    <Cell>{novaOcorrencia.area}</Cell>
+                    <Cell>{novaOcorrencia.ocorrencia}</Cell>
+                    <Cell>{novaOcorrencia.data}</Cell>
+                    <Cell>{novaOcorrencia.hora}</Cell>
+                </Row>
+            </ScrollView>
+        );
+    }
+
+    function handleAddOcorrencia() {
+        if(!selectedOcorrencia || !selectedArea){
+            alert("Preencha todos os campos!");
+            return
+        }
+        
+        const novaOcorrencia = {
+            id: Date.now().toString(),    // Gerando um ID único
+            roteiro_id: roteiro.roteiro_de_servico_id,  // Criando um ID único
+            area: selectedArea,
+            ocorrencia: selectedOcorrencia,
+            data: date,
+            hora: time
+        };
+
+        setRenderedItems(prevState => [...prevState, renderOcorrencia(novaOcorrencia)]);
+        setValueRendered([...valueRendered, novaOcorrencia]);
+
+
+        setSelectedArea("");
+        setSelectedOcorrencia("");
+    }
 
     useEffect(() => {
         if (roteiro && roteiro.areas) {
@@ -58,38 +106,68 @@ export function Avistamentos() {
         }
     }, [roteiro, generalData]);
 
+    useEffect(() =>{
+        const data = now.toLocaleDateString()
+        const hora = now.toLocaleTimeString()
+
+        setDate(data)
+        setTime(hora)
+    }, [])
+
     return (
         <Container>
             <HeaderScreen title="Avistamentos" />
-            <DropdownComponent 
+            <SubForm>
+                <Input
+                    value={time}
+                    onChange={setTime}
+                />
+            </SubForm>
+            
+            <SubForm>
+                <Input
+                    value={date}
+                    onChangeText={setDate}
+                />
+            </SubForm>
+            <DropdownComponent2 
                 data={ocorrencias.map(oco => ({ label: oco.desc_oco, value: oco.oco_id }))} 
-                label="Ocorrências" 
+                label="Ocorrências"
+                onSelect={setSelectedOcorrencia}
+                value={selectedOcorrencia}
             />
-            <DropdownComponent 
+            <DropdownComponent2
                 data={areas.map(area => ({ label: area.desc_area, value: area.area_id }))}  
                 label="Áreas"
+                onSelect={setSelectedArea}
+                value={selectedArea}
             />
             <PhotoPhorm title="Fotos dos avistamentos" />
 
-            <Button 
-                title="Adicionar" 
-                type="PRIMARY"
-            />
+            <ScrollView>   
+                <Button 
+                    title="Adicionar" 
+                    type="PRIMARY"
+                    onPress={handleAddOcorrencia}
+                />
+                
+                <DataTable/>
+                {renderedItems}
+
+            </ScrollView>
+                <ButtonForm>
+                    <Button 
+                        title="Voltar" 
+                        type="SECONDARY"
+                        onPress={()=> navigation.goBack()}
+                    />
+
+                    <Button 
+                        title="Finalizar" 
+                        type="TERTIARY"
+                    />
+                </ButtonForm>
             
-            <DataTable/>
-
-            <ButtonForm>
-                <Button 
-                    title="Voltar" 
-                    type="SECONDARY"
-                    onPress={()=> navigation.goBack()}
-                />
-
-                <Button 
-                    title="Finalizar" 
-                    type="TERTIARY"
-                />
-            </ButtonForm>
         </Container>
     )
 }
