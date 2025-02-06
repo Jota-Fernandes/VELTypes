@@ -174,3 +174,9 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '8.10.2'
+}
+
+tasks.register("prepareKotlinBuildScriptModel"){}
