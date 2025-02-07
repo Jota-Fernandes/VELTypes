@@ -5,6 +5,8 @@ import theme from "./src/theme";
 
 import { AuthProvider } from "src/context/AuthContext";
 import { RoteiroProvider } from "src/context/RoteirosContext";
+import { NavigationContainer } from "@react-navigation/native";
+import { AppRoutes } from "@routes/app.routes";
 
 import { Routes } from "@routes/index";
 
@@ -14,7 +16,9 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <RoteiroProvider>
-          <Routes/>
+          <NavigationContainer>
+            <AppRoutes/>
+          </NavigationContainer>
           <StatusBar
             barStyle="light-content"
             backgroundColor="black"

@@ -9,6 +9,7 @@ import { DadosServicos } from "@screens/DadosDoServico";
 import { ProdutosPorArea } from "@screens/ProdutosPorArea";
 import { DadosReview } from "@screens/DadosReview";
 import { Armadilha } from "@screens/Armadilhas";
+import Login  from "@screens/Login";
 
 import { DrawerNavigator } from "./drawer.routes";
 
@@ -17,6 +18,10 @@ const { Navigator, Screen} = createNativeStackNavigator();
 export function AppRoutes(){
     return(
         <Navigator screenOptions={{headerShown: false}}>
+            <Screen
+                name="Login"
+                component={Login}
+            />
             <Screen 
                 name="Servicos" 
                 component={DrawerNavigator}

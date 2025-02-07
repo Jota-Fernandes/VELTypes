@@ -1,4 +1,5 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
+import { getRealm } from 'src/database/realm';
 
 import { Text, Pressable, Alert, ScrollView } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
@@ -7,6 +8,8 @@ import bg_image from '@assets/bg_evolucao.jpg';
 import { Input } from '@components/Input';
 import { Button } from '@components/Button';
 import { ButtonIcon } from '@components/ButtonIcon';
+
+import { useNavigation } from '@react-navigation/native';
 
 import '../../services/i18next'
 
@@ -18,12 +21,14 @@ export default function Login() {
   const { t, i18n } = useTranslation();
 
   const [hidepassword, setHidePassword] = useState(true);
-  const {signed, handleLogin} = useContext(AuthContext)
+  const {setUser, handleLogin, signed} = useContext(AuthContext)
   const [userForm, setUserForm] = useState({
     login: '',
     password: '',
     replica: ''
   })
+
+  const navigation = useNavigation();
 
   const [currentLanguage, setLanguage] = useState('ptbr');
 
@@ -71,6 +76,41 @@ export default function Login() {
     }
     setUserForm(prevUser => ({ ...prevUser, [name]: value }));
   }
+
+   async function fetchUsers() {
+          const realm = await getRealm()
+  
+          try{
+              if(!realm.isClosed){
+                  const response = realm.objects('Auth')
+                  console.log('response:', Array.from(response))
+  
+                  if (response.length > 0) {
+                      const firstUser = response[0]; // Pegando o primeiro usuário
+                      setUser({
+                          id: String(firstUser._id),  // Garantindo que seja string
+                          login: String(firstUser.login),
+                          password: String(firstUser.password),
+                          token: firstUser.token ? String(firstUser.token) : "",
+                          replica: String(firstUser.replica),
+                          sistema: String(firstUser.sistema),
+                      });
+  
+                      navigation.navigate('Servicos');
+                  }
+              } else {
+                  console.error("Erro: A instância do Realm está fechada.");
+  
+              }
+              
+          } catch(error){
+              console.error('fetchUsers', error)
+          }
+      }
+
+  useEffect(() => {
+    fetchUsers()
+  }, [signed]);
 
   return (
     <Container>

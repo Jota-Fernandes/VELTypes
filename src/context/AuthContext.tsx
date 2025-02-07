@@ -2,6 +2,7 @@ import { createContext, useState, ReactNode, useEffect } from "react";
 import AuthApi from "src/services/login/AuthApi";
 import { getRealm } from "src/database/realm";
 import { AuthSchemaType } from "src/database/schemas/AuthSchema";
+import { useNavigation } from "@react-navigation/native";
 
 type User = {
     id: string;
@@ -17,7 +18,7 @@ type AuthContextType = {
     setUser: (user: User) => void;
     signed: boolean;
     setSigned: (signed: boolean) => void;
-    handleLogin: (login: string, password: string, replica: string) => void;
+    handleLogin: (login: string, password: string, replica: string) => void; 
 };
 
 export const AuthContext = createContext<AuthContextType>({ 
@@ -43,37 +44,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         sistema: ""
     });
     const [signed, setSigned] = useState(false);
+    /* const navigation = useNavigation();
+ */
 
-//Sincronizar os dados do banco
-    async function fetchUsers() {
-        const realm = await getRealm()
-
-        try{
-            if(!realm.isClosed){
-                const response = realm.objects('Auth')
-                console.log('response:', Array.from(response))
-
-                if (response.length > 0) {
-                    const firstUser = response[0]; // Pegando o primeiro usuário
-                    setUser({
-                        id: String(firstUser._id),  // Garantindo que seja string
-                        login: String(firstUser.login),
-                        password: String(firstUser.password),
-                        token: firstUser.token ? String(firstUser.token) : "",
-                        replica: String(firstUser.replica),
-                        sistema: String(firstUser.sistema),
-                    });
-                    setSigned(true);
-                }
-            } else {
-                console.error("Erro: A instância do Realm está fechada.");
-
-            }
-            
-        } catch(error){
-            console.error('fetchUsers', error)
-        }
-    }
+   
 
     async function saveDataUser(userData: AuthSchemaType){
         const realm = await getRealm();
@@ -124,14 +98,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 sistema: response.data.sistema_id
             });
 
+            setSigned(true)
+
         } catch(error){
             console.error('handleLogin', error)
-        }
+        } 
     }
-
-    useEffect(() => {
-        fetchUsers()
-    }, []);
 
     return (
         <AuthContext.Provider 

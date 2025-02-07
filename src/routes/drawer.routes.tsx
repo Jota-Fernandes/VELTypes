@@ -17,7 +17,7 @@ export function DrawerNavigator(props : any) {
                 }
             }}
         >
-            <Screen name="Serviços" component={Servicos} />
+            <Screen name="Servico(s)" component={Servicos} />
             <Screen name="Configurações" component={Configuracoes} />
             <Screen name="ServiçosExecutados" component={ServicosExecutados} />
         </Navigator>

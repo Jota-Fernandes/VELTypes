@@ -37,27 +37,27 @@ class RoteirosApi extends ApiManagement {
     }
 
     async sendRoteiros(roteiro: any) {
-/*         return await Promise.all(
-          roteiro.map(async servico => {
+        return await Promise.all(
+          roteiro.map(async ({servico} : any) => {
             const idServico = servico.roteiro_de_servico_id;
     
             const data = [
-              {
+             /*  {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
                 packages:
                   servico.armadilhas.length === 0 ? 1 : servico.armadilhas.length,
                 type: 'armadilhas',
                 data: servico.armadilhas,
-              },
-              {
+              }, */
+            /*   {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
                 packages: servico.reg_oco.length === 0 ? 1 : servico.reg_oco.length,
                 type: 'reg_oco',
                 data: servico.reg_oco,
-              },
-              {
+              }, */
+           /*    {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
                 packages:
@@ -66,21 +66,22 @@ class RoteirosApi extends ApiManagement {
                     : servico.reg_prod_area.length,
                 type: 'reg_prod_area',
                 data: servico.reg_prod_area,
-              },
+              }, */
               {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
                 packages: servico.reg_nc.length === 0 ? 1 : servico.reg_nc.length,
                 type: 'reg_nc',
                 data: servico.reg_nc,
+                charsCount: 0
               },
-              {
+              /* {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
                 packages: servico.foto_os.length === 0 ? 1 : servico.foto_os.length,
                 type: 'foto_os',
                 data: servico.foto_os,
-              },
+              }, */
             ];
     
             const header = {
@@ -88,6 +89,7 @@ class RoteirosApi extends ApiManagement {
               token: this._user.token,
               type: 'header',
               data: Object.assign({}, servico),
+              charsCount: 0,
             };
     
             data.forEach(key => delete header.data[key.type]);
@@ -107,7 +109,7 @@ class RoteirosApi extends ApiManagement {
                         .catch(Promise.reject);
                     } else {
                       return await Promise.all(
-                        pkg.data.map(async (subpkg, index) => {
+                        pkg.data.map(async (subpkg : any, index : any) => {
                           const toSend = {
                             roteiro_de_servico_id: pkg.roteiro_de_servico_id,
                             token: pkg.token,
@@ -139,7 +141,7 @@ class RoteirosApi extends ApiManagement {
           }),
         ).catch(error => {
           throw error;
-        });*/
+        });
       } 
 }
 
