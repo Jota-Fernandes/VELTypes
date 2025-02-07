@@ -6,6 +6,7 @@ import { RoteiroSchemaType } from "src/database/schemas/RoteiroSchema";
 import { SecondGeneralDataType, GeneralDataType } from "src/database/schemas/CheckInSchema";
 import CheckInApi from "src/services/checkIn/CheckInApi";
 import Realm from "realm";
+import TableRepository from "src/Repository/TableRepository";
 
 type RoteiroContextType = {
     sincronizar: () => void,
@@ -144,8 +145,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
             console.error('Error saving data ==> ', error)
         }
     }
-    
-    
+
     async function requestRoteiros(): Promise<RoteiroSchemaType | undefined> {
 
         const apiReq = new RoteirosApi(user);
@@ -161,6 +161,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
 
         return undefined
     }
+
     async function loadGeneralData(){
         try {
             const realm = await getRealm();
@@ -256,7 +257,6 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
         }
     }
     
-
     async function requestGeneralData(){
         const generalData = new CheckInApi(user)
         try{
@@ -271,9 +271,21 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
         }
     }
 
+    async function sendRoteirosFinished(){
+        const roteiroFinished = new RoteirosApi(user)
+
+        try {
+            await roteiroFinished.sendRoteiros(roteiros)
+        } catch(error){
+
+        }
+    }
+
     async function sincronizar(){
 
         try{
+            const roteirosFinished = await sendRoteirosFinished()
+
             const roteirosSynced = await requestRoteiros()
 
             if (roteirosSynced) {
@@ -284,6 +296,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
             if(generalDataSynced){
                 saveGeneralData(generalDataSynced);
             }
+
 
         } catch(error){
             console.error('Sincronizar roteiros ==> ', error)

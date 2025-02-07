@@ -6,3 +6,34 @@ export const Container = styled.View`
     flex: 1;
     background-color: ${({theme} : DefaultTheme) => theme.COLORS.GRAY_50};
 `
+
+export const SubForm = styled.View`
+    width: 95%;
+    height: 70px;
+    background-color: ${({theme} : DefaultTheme) => theme.COLORS.WHITE};
+
+    border-radius: 25px;
+    align-items: center;
+
+    margin: 15px 10px 15px 10px;
+
+    flex-direction: row;
+`
+
+export const Row = styled.View`
+    flex-direction: row;
+    justify-content: space-between;
+    min-height: 50px;
+    max-height: 80px;
+    padding: 10px;
+    background-color: ${({theme} : DefaultTheme) => theme.COLORS.WHITE};
+    border: 1px;
+    align-items: center;
+`
+
+export const Cell = styled.Text`
+    font-family: ${({theme} : DefaultTheme) => theme.FONT_FAMILY.REGULAR};
+    color: ${({theme} : DefaultTheme) => theme.COLORS.GRAY_500_MUTED};
+    font-size: 15px;
+    margin-right: 10px;
+`
