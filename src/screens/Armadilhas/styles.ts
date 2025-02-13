@@ -14,13 +14,14 @@ export const Title = styled.Text`
 export const TitleHeader = styled.View`
     width: 100%;
     background-color: ${({ theme }: DefaultTheme) => theme.COLORS.GRAY_500_MUTED};
+    margin-bottom: 10px;
 `
 
 export const Heading = styled.Text`
     font-family: ${({ theme }: DefaultTheme) => theme.FONT_FAMILY.BOLD};
-    color: ${({ theme }: DefaultTheme) => theme.COLORS.GRAY_500_MUTED};
+    color: ${({ theme }: DefaultTheme) => theme.COLORS.BLACK};
 
-    margin: 30px 30px 0 30px;
+    margin: 10px 20px 0 20px;
     font-size: 19px;
 `
 

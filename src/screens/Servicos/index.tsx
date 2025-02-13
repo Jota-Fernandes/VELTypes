@@ -12,10 +12,24 @@ import { Container, Title, TextTitle, Icon } from "./styles";
 
 export function Servicos() {
     const {roteiros, generalData} = useContext(RoteirosContext)
-
     const {t} = useTranslation();
-
     const navigation = useNavigation();
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+    
+    // Função para formatar a hora no formato HH:MM
+    const formatTime = (timeString: string) => {
+        const time = new Date(`1970-01-01T${timeString}Z`); // Padrão para parsing da hora
+        const hours = String(time.getUTCHours()).padStart(2, '0');
+        const minutes = String(time.getUTCMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
 
     return(
         <Container>
@@ -26,12 +40,13 @@ export function Servicos() {
                 </TextTitle>
             </Title>
             <FlatList
-                data={roteiros}
+                data={roteiros.filter(roteiro => roteiro.status === '1')}
                 keyExtractor={item => item.roteiro_de_servico_id}
                 renderItem={(item) => (
                     <TouchableOpacity onPress={() => navigation.navigate('RoteiroMenu', {roteiro: item.item, generalData})}>
                         <ScreenCard
-                            title={item.item.nome_cliente}
+                            title={`${item.item.roteiro_de_servico_id} - ${item.item.nome_cliente}`}
+                            secondTitle={`${formatDate(item.item.data)} - ${formatTime(item.item.hora)}`}
                             subtitle={item.item.endereco}
                         />
                     </TouchableOpacity>

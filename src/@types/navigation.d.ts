@@ -4,7 +4,7 @@ import { GeneralDataType, SecondGeneralDataType } from "src/database/schemas/Che
 export declare global {
     namespace ReactNavigation {
         interface RootParamList extends ParamListBase{
-            RoteiroMenu: { roteiro: RoteiroSchemaType, generalData: SecondGeneralDataType };
+            RoteiroMenu: { roteiro: RoteiroSchemaType, generalData: SecondGeneralDataType, armadilha };
             Servicos: undefined;
             Avistamentos: undefined;
             MenuArmadilhas: undefined;
@@ -15,7 +15,8 @@ export declare global {
             DadosReview: undefined;
             Armadilha: undefined;
             Configurações: undefined;
-            ServiçosExecutados: undefined
+            ServiçosExecutados: undefined;
+            assinatura: { text: string; onOK: (signature: string) => void };
         }
     }
 }

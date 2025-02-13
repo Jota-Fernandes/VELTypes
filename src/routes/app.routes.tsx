@@ -9,11 +9,12 @@ import { DadosServicos } from "@screens/DadosDoServico";
 import { ProdutosPorArea } from "@screens/ProdutosPorArea";
 import { DadosReview } from "@screens/DadosReview";
 import { Armadilha } from "@screens/Armadilhas";
+import Sign from "@components/SignatureScreen/index";
 import Login  from "@screens/Login";
 
 import { DrawerNavigator } from "./drawer.routes";
 
-const { Navigator, Screen} = createNativeStackNavigator();
+const { Navigator, Screen} = createNativeStackNavigator<ReactNavigation.RootParamList>();
 
 export function AppRoutes(){
     return(
@@ -61,6 +62,10 @@ export function AppRoutes(){
             <Screen
                 name="Armadilha" 
                 component={Armadilha}
+             />
+             <Screen
+                name="assinatura" 
+                component={Sign}
              />
         </Navigator>
     )

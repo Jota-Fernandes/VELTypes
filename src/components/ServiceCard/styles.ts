@@ -33,8 +33,10 @@ export const Title = styled.Text`
 export const Subtitle = styled.Text`
 
     ${({theme} : DefaultTheme) => css`
-            font-family: ${theme.FONT_FAMILY.REGULAR};
-            color: ${theme.COLORS.GRAY_500_MUTED};
-            font-size: ${theme.FONT_SIZE.SM}px;
+        font-family: ${theme.FONT_FAMILY.REGULAR};
+        color: ${theme.COLORS.GRAY_500_MUTED};
+        font-size: ${theme.FONT_SIZE.SM}px;
+        flex-wrap: wrap;
+        width: 80%;
     `}  
 `

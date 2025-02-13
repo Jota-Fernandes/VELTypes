@@ -8,8 +8,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { DropdownComponent2 } from "@components/Dropdown2";
 import { Input } from "@components/Input";
-import { ScrollView } from "react-native";
-
+import { ScrollView, Alert } from "react-native";
+import { getRealm } from "src/database/realm";
 import { Container, SubForm, Row, Cell } from "./styles";
 import { CustomCheckbox } from "@components/Checkbox";
 
@@ -69,9 +69,8 @@ export function Avistamentos() {
         }
         
         const novaOcorrencia = {
-            id: Date.now().toString(),    // Gerando um ID único
-            roteiro_id: roteiro.roteiro_de_servico_id,  // Criando um ID único
-            area: selectedArea,
+            id: Date.now().toString(),   
+            roteiro_id: roteiro.roteiro_de_servico_id,
             ocorrencia: selectedOcorrencia,
             data: date,
             hora: time
@@ -83,6 +82,47 @@ export function Avistamentos() {
 
         setSelectedArea("");
         setSelectedOcorrencia("");
+    }
+
+    async function handleFinishService(){
+        if (valueRendered.length === 0) {
+            Alert.alert("Erro", "Nenhuma não conformidade adicionada!");
+            return;
+        }
+
+        try{
+            const realm = await getRealm();
+            realm.write(() =>{
+                valueRendered.forEach((item) => {                    
+                    const existe = realm.objects("Ocorrencia").filtered(`id == '${item.id}'`).length > 0;
+                    if (!existe) {
+                        realm.create("Ocorrencia", {
+                            id: Date.now().toString(),
+                            roteiro_id: roteiro.roteiro_de_servico_id,
+                            area: item.area,
+                            ocorrencia: item.ocorrencia,
+                            data: item.data,
+                            hora: item.hora,
+                        });
+                    }
+                });
+            })
+        } catch (error) {
+
+        }
+    }
+
+    function handleGoBack(){
+        Alert.alert("Retornar", "Deseja retornar? Os dados que não foram finalizado serão perdidos", [
+            {
+                text: 'Sim',
+                onPress: () => navigation.goBack()
+            },
+            {
+                text: 'Não',
+                style: 'cancel'
+            }
+        ])
     }
 
     useEffect(() => {
@@ -159,7 +199,7 @@ export function Avistamentos() {
                     <Button 
                         title="Voltar" 
                         type="SECONDARY"
-                        onPress={()=> navigation.goBack()}
+                        onPress={handleGoBack}
                     />
 
                     <Button 

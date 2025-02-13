@@ -52,6 +52,7 @@ export function NaoConformidades() {
         mc_id: string;
         desc_mc: string;
     }>>([]);
+    
     const [selectedArea, setSelectedArea] = useState("");
     const [selectedNaoConformidade, setSelectedNaoConformidade] = useState("");
     const [selectedRegistrada, setSelectedRegistrada] = useState("");
@@ -179,6 +180,20 @@ export function NaoConformidades() {
         }
     }
 
+    function handleGoBack(){
+        Alert.alert("Retornar", "Deseja retornar? Os dados que não foram finalizado serão perdidos", [
+            {
+                text: 'Sim',
+                onPress: () => navigation.goBack()
+            },
+            {
+                text: 'Não',
+                style: 'cancel'
+            }
+        ])
+    }
+
+
     useEffect(() => {
         if (roteiro && roteiro.areas) {
 
@@ -289,7 +304,7 @@ export function NaoConformidades() {
                         <Button 
                             title="Voltar" 
                             type="SECONDARY"
-                            onPress={() => navigation.goBack()}
+                            onPress={handleGoBack}
                         />
 
                         <Button 

@@ -1,24 +1,16 @@
 import { Container, Content, Text, Title } from "./styles";
 import { HeaderScreen } from "@components/Header";
-import { DropdownComponent } from "@components/Dropdown";
 import { PhotoPhorm } from "@components/PhotoPhorm";
 import { Button } from "@components/Button";
 import { ButtonForm } from "@components/Button/styles";
 import {useRoute, RouteProp} from "@react-navigation/native"
-import { ScrollView } from "react-native";
+import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from "react";
+import { DropdownComponent2 } from "@components/Dropdown2";
+import Sign from "@components/SignatureScreen";
 
 type DadosServicoRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
-
-const data = [
-    { label: 'Item 1', value: '1' },
-    { label: 'Item 2', value: '2' },
-    { label: 'Item 3', value: '3' },
-    { label: 'Item 4', value: '4' },
-    { label: 'Item 5', value: '5' },
-    { label: 'Item 6', value: '6' },
-]
 
 export function DadosServicos() {
     
@@ -29,14 +21,47 @@ export function DadosServicos() {
         veiculo_id: string;
         desc_veiculo: string;
     }>>([]);
+    const [selectedVeiculo, setSelectedVeiculo] = useState('');
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+    
+    // Função para formatar a hora no formato HH:MM
+    const formatTime = (timeString: string) => {
+        const time = new Date(`1970-01-01T${timeString}Z`); // Padrão para parsing da hora
+        const hours = String(time.getUTCHours()).padStart(2, '0');
+        const minutes = String(time.getUTCMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+
 
     const dadosServicos = {
         text: `${roteiro.nome_cliente} 
         \nTelefones: ${roteiro.tel} / ${roteiro.tel_1} / ${roteiro.tel_2}
-        \nRoteiro: ${roteiro.roteiro_de_servico_id} - ${roteiro.data} - ${roteiro.hora}
+        \nRoteiro: ${roteiro.roteiro_de_servico_id} - ${formatDate(roteiro.data)} - ${formatTime(roteiro.hora)}
         \n${roteiro.endereco}
         `
     }
+
+    
+    function handleGoBack(){
+        Alert.alert("Retornar", "Deseja retornar? Os dados que não foram finalizado serão perdidos", [
+            {
+                text: 'Sim',
+                onPress: () => navigation.goBack()
+            },
+            {
+                text: 'Não',
+                style: 'cancel'
+            }
+        ])
+    }
+
 
     useEffect(() => {
 
@@ -52,7 +77,7 @@ export function DadosServicos() {
     return (
         <Container>
             <HeaderScreen title="Dados dos Serviços" />
-            <ScrollView>
+
                 <Content>
                     <Text>{dadosServicos.text}</Text>
                 </Content>
@@ -65,9 +90,12 @@ export function DadosServicos() {
                 <Content>
                     <Text>{roteiro.descricao_servicos}</Text>
                 </Content>
-                <DropdownComponent 
+                <DropdownComponent2
                     data={veiculos.map(veiculo => ({ label: veiculo.desc_veiculo, value: veiculo.veiculo_id }))}  
-                    label="Veiculos"/>
+                    label="Veiculos"
+                    onSelect={setSelectedVeiculo}
+                    value={selectedVeiculo}
+                />
 
                 <PhotoPhorm title="Foto da Ordem de Serviço"/>
                 <PhotoPhorm title="Fotos adicionais"/>
@@ -75,19 +103,23 @@ export function DadosServicos() {
                 <Button 
                     title="Prancheta de Assinatura Digital" 
                     type="TERTIARY"
+                    onPress={() => {navigation.navigate('assinatura', {
+                        text: "assinatura digital",
+                        onOk: "teste",
+                    })}}
                 />
                 <ButtonForm>
                     <Button 
                         title="Voltar" 
                         type="SECONDARY"
-                        onPress={() => navigation.goBack()}
+                        onPress={handleGoBack}
                     />
                     <Button 
                         title="Salvar" 
                         type="PRIMARY"
                     />
                 </ButtonForm>
-            </ScrollView>
+           
         </Container>
     )
 }

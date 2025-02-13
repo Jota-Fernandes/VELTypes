@@ -33,11 +33,12 @@ export function DadosReview(){
     async function finishService(){
         try{
             const realm = await getRealm();
-            console.log('id',roteiro.roteiro_de_servico_id);
+            console.log('id', roteiro.roteiro_de_servico_id);
             realm.write(() => {
                 let roteiroToFinish = realm.objectForPrimaryKey('Roteiro', roteiro.roteiro_de_servico_id);
+
                 if (roteiroToFinish) {
-                    roteiro.status = "2";
+                    roteiroToFinish.status = "2";
                 } else {
                     console.warn("Roteiro não encontrado");
                 }

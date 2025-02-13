@@ -22,4 +22,5 @@ export const Cell = styled.Text`
     color: ${({theme} : DefaultTheme) => theme.COLORS.GRAY_500_MUTED};
     font-size: 15px;
     margin-right: 10px;
+    width: 100%;
 `

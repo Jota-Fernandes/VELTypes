@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 
-import { Container } from "./styles";
+import { Container, Cell, Row } from "./styles";
 import { HeaderScreen } from "@components/Header";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { Button } from "@components/Button";
 import { ButtonForm } from "@components/Button/styles";
 import { DataTable } from "@components/DataTable";
+import { CustomCheckbox } from "@components/Checkbox";
+import { ScrollView, Alert } from "react-native";
 
 import { DropdownComponent2 } from "@components/Dropdown2"; 
 
@@ -38,9 +40,32 @@ export function ProdutosPorArea() {
     const [selectedProdutos, setSelectedProdutos] = useState("");
     const [selectedArea, setSelectedArea] = useState("");
     const [selectedEquipamentos, setSelectedEquipamentos] = useState("");
-
+    const [renderedItems, setRenderedItems] = useState<any[]>([]);
+    const [valueRendered, setValueRendered] = useState<any[]>([]);
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const {roteiro, generalData} = route.params
 
+    function toggleSelection(id: string) {
+        setSelectedItems(prevSelected => 
+            prevSelected.includes(id) 
+                ? prevSelected.filter(itemId => itemId !== id)
+                : [...prevSelected, id]
+        );
+    }
+
+    function renderOcorrencia(novaOcorrencia: any) {
+        return (
+            <ScrollView horizontal={true} key={novaOcorrencia.id}>
+                <Row>
+                    <CustomCheckbox  onPress={() => toggleSelection(novaOcorrencia.id)}/>
+                    <Cell>{novaOcorrencia.area}</Cell>
+                    <Cell>{novaOcorrencia.ocorrencia}</Cell>
+                    <Cell>{novaOcorrencia.data}</Cell>
+                    <Cell>{novaOcorrencia.hora}</Cell>
+                </Row>
+            </ScrollView>
+        );
+    }
 
     function handleAddProdutos() {
         if(!selectedProdutos || !selectedPragas){
@@ -57,12 +82,27 @@ export function ProdutosPorArea() {
             praga: selectedPragas
         };
 
-      /*   setRenderedItems(prevState => [...prevState, renderOcorrencia(novaOcorrencia)]);
-        setValueRendered([...valueRendered, novaOcorrencia]);
+        setRenderedItems(prevState => [...prevState, renderOcorrencia(novosProdutos)]);
+        setValueRendered([...valueRendered, novosProdutos]);
 
 
         setSelectedArea("");
-        setSelectedOcorrencia(""); */
+        setSelectedProdutos("");
+        setSelectedEquipamentos("");
+        setSelectedPragas("");
+    }
+
+    function handleGoBack(){
+        Alert.alert("Retornar", "Deseja retornar? Os dados que não foram finalizado serão perdidos", [
+            {
+                text: 'Sim',
+                onPress: () => navigation.goBack()
+            },
+            {
+                text: 'Não',
+                style: 'cancel'
+            }
+        ])
     }
 
 
@@ -127,17 +167,20 @@ export function ProdutosPorArea() {
                 onSelect={setSelectedEquipamentos}
                 value={selectedEquipamentos}
             />
-
-            <Button 
-                title="Adicionar"
-                type="PRIMARY"
-            />
-            <DataTable />
+            <ScrollView>            
+                <Button 
+                    title="Adicionar"
+                    type="PRIMARY"
+                    onPress={handleAddProdutos}
+                />
+                <DataTable />
+                {renderedItems}
+            </ScrollView>
             <ButtonForm>
                 <Button 
                     title="Voltar" 
                     type="SECONDARY" 
-                    onPress={()=> navigation.goBack()}
+                    onPress={handleGoBack}
                 />
                 <Button title="Finalizar" type="TERTIARY"/>
             </ButtonForm>
