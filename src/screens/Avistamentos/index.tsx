@@ -72,6 +72,7 @@ export function Avistamentos() {
             id: Date.now().toString(),   
             roteiro_id: roteiro.roteiro_de_servico_id,
             ocorrencia: selectedOcorrencia,
+            area: selectedArea,
             data: date,
             hora: time
         };
@@ -93,10 +94,11 @@ export function Avistamentos() {
         try{
             const realm = await getRealm();
             realm.write(() =>{
-                valueRendered.forEach((item) => {                    
-                    const existe = realm.objects("Ocorrencia").filtered(`id == '${item.id}'`).length > 0;
+                valueRendered.forEach((item) => {           
+                    console.log("area", item.area)         
+                    const existe = realm.objects("OcorrenciasTable").filtered(`id == '${item.id}'`).length > 0;
                     if (!existe) {
-                        realm.create("Ocorrencia", {
+                        realm.create("OcorrenciasTable", {
                             id: Date.now().toString(),
                             roteiro_id: roteiro.roteiro_de_servico_id,
                             area: item.area,
@@ -107,8 +109,11 @@ export function Avistamentos() {
                     }
                 });
             })
+            Alert.alert("Sucesso", "As não conformidades foram salvas com sucesso!");
         } catch (error) {
-
+            console.error('Erro ao inserir no banco',error);
+        } finally{
+            navigation.goBack()
         }
     }
 
@@ -205,6 +210,7 @@ export function Avistamentos() {
                     <Button 
                         title="Finalizar" 
                         type="TERTIARY"
+                        onPress={handleFinishService}
                     />
                 </ButtonForm>
             

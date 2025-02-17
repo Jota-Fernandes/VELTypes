@@ -24,3 +24,24 @@ export class NaoConformidade extends Realm.Object<NaoConformidade> {
     },
   };
 }
+
+export class Ocorrencias extends Realm.Object<Ocorrencias> {
+  id!: string;
+  roteiro_id!: string;
+  area!: string;
+  ocorrencias!: string;
+  data!: string;
+  hroa!: string;
+
+  static schema: Realm.ObjectSchema = {
+    name: "OcorrenciasTable",
+    properties: {
+        id: "string",
+        roteiro_id: "string",
+        area: "string",
+        ocorrencia: "string",
+        data: "string",
+        hora: "string",
+    },
+  };
+}

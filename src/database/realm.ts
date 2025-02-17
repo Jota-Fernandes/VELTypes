@@ -23,7 +23,10 @@ import {
     TiposArmSchema,
     VeiculosSchema
 } from './schemas/CheckInSchema';
-import { NaoConformidade } from './schemas/TableSchemas';
+import { 
+    NaoConformidade,
+    Ocorrencias
+} from './schemas/TableSchemas';
 
 let realmInstance: Realm | null = null;
 
@@ -53,7 +56,8 @@ export const getRealm = async () => {
                 TiposArmSchema,
                 VeiculosSchema,
                 GeneralDataSchema,
-                NaoConformidade
+                NaoConformidade,
+                Ocorrencias
             ],
         });
         
