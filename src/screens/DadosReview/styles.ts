@@ -1,4 +1,4 @@
-import styled from "styled-components/native";
+import styled, {css} from "styled-components/native";
 
 import { DefaultTheme } from "styled-components/native";
 
@@ -10,15 +10,17 @@ export const Container = styled.View`
 export const HeaderTable = styled.View`
     width: 100%;
     background-color: ${({theme} : DefaultTheme) => theme.COLORS.TEAL_700};
+    flex-direction: row;
     height: 50px;
     margin-top: 20px;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
 `
 
 export const TitleHeader = styled.Text`
     font-size: 20px;
     color: ${({theme} : DefaultTheme) => theme.COLORS.WHITE};
-    margin-left: 10px;
 `
 
 export const Row = styled.View`
@@ -37,4 +39,12 @@ export const Cell = styled.Text`
     color: ${({theme} : DefaultTheme) => theme.COLORS.GRAY_500_MUTED};
     font-size: 15px;
     margin-right: 10px;
+`
+
+export const NumbersOfRow = styled.Text`
+    ${({theme,} :  DefaultTheme) => css`
+        font-family: ${theme.FONT_FAMILY.BOLD};
+        font-size: ${theme.FONT_SIZE.SM}px;
+        color: ${theme.COLORS.WHITE};
+    `};
 `

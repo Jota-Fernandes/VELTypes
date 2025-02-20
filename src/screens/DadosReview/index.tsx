@@ -1,5 +1,5 @@
 import { HeaderScreen } from "@components/Header";
-import { Container , HeaderTable, TitleHeader, Cell, Row} from "./styles";
+import { Container , HeaderTable, TitleHeader, Cell, Row, NumbersOfRow} from "./styles";
 import { getRealm } from "src/database/realm";
 import { useState, useEffect } from "react";
 import { ScrollView } from "react-native";
@@ -82,8 +82,21 @@ export function DadosReview(){
             <HeaderScreen title="Dados Review" />
             <HeaderTable>
                 <TitleHeader>Não Conformidades</TitleHeader>
+                <NumbersOfRow>{renderedItems.length}</NumbersOfRow>
             </HeaderTable>
             {renderedItems}
+            <HeaderTable>
+                <TitleHeader>Produtos por área</TitleHeader>
+                <NumbersOfRow></NumbersOfRow>
+            </HeaderTable>
+            <HeaderTable>
+                <TitleHeader>Avistamentos</TitleHeader>
+                <NumbersOfRow></NumbersOfRow>
+            </HeaderTable>
+            <HeaderTable>
+                <TitleHeader>Dados do Serviço</TitleHeader>
+                <NumbersOfRow></NumbersOfRow>
+            </HeaderTable>                        
             <Button 
                 title="Finalizar serviço" 
                 type="TERTIARY"

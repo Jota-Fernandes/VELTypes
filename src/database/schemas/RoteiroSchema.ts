@@ -160,7 +160,6 @@ export const ArmadilhasSchema = {
         sigla_armadilha: "string?",
         tipo_de_armadilha_id: "string?"
     },
-    primaryKey: 'armadilha_id'
 };
 
 export const ProdutosSchema = {
