@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Container, Cell, Row } from "./styles";
+import { Container, Cell, Row, SubForm } from "./styles";
 import { HeaderScreen } from "@components/Header";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { Button } from "@components/Button";
@@ -8,7 +8,7 @@ import { ButtonForm } from "@components/Button/styles";
 import { DataTable } from "@components/DataTable";
 import { CustomCheckbox } from "@components/Checkbox";
 import { ScrollView, Alert } from "react-native";
-
+import { Input } from "@components/Input";
 import { DropdownComponent2 } from "@components/Dropdown2"; 
 
 type ProdutosAreaRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
@@ -53,15 +53,19 @@ export function ProdutosPorArea() {
         );
     }
 
-    function renderOcorrencia(novaOcorrencia: any) {
+    function renderProdAreas(novaProdAreas: any) {
+
+        console.log('prodAreas',novaProdAreas.produto)
+        console.log('prodAreas',novaProdAreas.praga)
+        
         return (
-            <ScrollView horizontal={true} key={novaOcorrencia.id}>
+            <ScrollView horizontal={true} key={novaProdAreas.id}>
                 <Row>
-                    <CustomCheckbox  onPress={() => toggleSelection(novaOcorrencia.id)}/>
-                    <Cell>{novaOcorrencia.area}</Cell>
-                    <Cell>{novaOcorrencia.ocorrencia}</Cell>
-                    <Cell>{novaOcorrencia.data}</Cell>
-                    <Cell>{novaOcorrencia.hora}</Cell>
+                    <CustomCheckbox  onPress={() => toggleSelection(novaProdAreas.id)}/>
+                    <Cell>{novaProdAreas.area}</Cell>
+                    <Cell>{novaProdAreas.produto}</Cell>
+                    <Cell>{novaProdAreas.praga}</Cell>
+                    <Cell>{novaProdAreas.equipamento}</Cell>
                 </Row>
             </ScrollView>
         );
@@ -82,7 +86,7 @@ export function ProdutosPorArea() {
             praga: selectedPragas
         };
 
-        setRenderedItems(prevState => [...prevState, renderOcorrencia(novosProdutos)]);
+        setRenderedItems(prevState => [...prevState, renderProdAreas(novosProdutos)]);
         setValueRendered([...valueRendered, novosProdutos]);
 
 
@@ -155,6 +159,14 @@ export function ProdutosPorArea() {
                 onSelect={setSelectedProdutos}
                 value={selectedProdutos}
             />
+
+            <SubForm>
+                <Input 
+                    placeholder="Quantidade"
+                    keyboardType="number-pad"
+                    />
+            </SubForm>
+
             <DropdownComponent2 
                 data={areas.map(area => ({ label: area.desc_area, value: area.area_id }))} 
                 label="Áreas"

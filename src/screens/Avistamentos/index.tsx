@@ -159,6 +159,30 @@ export function Avistamentos() {
         setTime(hora)
     }, [])
 
+    useEffect(() => {
+        async function loadAvistamento(){
+            try{
+                const realm = await getRealm();
+                const storedNaoConformidades = realm.objects("OcorrenciasTable").filtered(`roteiro_id == '${roteiro.roteiro_de_servico_id}'`);
+
+                const loadedItems = storedNaoConformidades.map((item: any) => ({
+                    id: item.id,
+                    area: item.area,
+                    ocorrencia: item.ocorrencia,
+                    data: item.data,
+                    hora: item.hora,
+                }));
+
+                setValueRendered(loadedItems);
+                setRenderedItems(loadedItems.map(renderOcorrencia));
+            } catch(error){
+                console.error("Avistamento - Erro ao carregar dados do banco:", error);
+            }
+        }
+
+        loadAvistamento()
+    },[])
+
     return (
         <Container>
             <HeaderScreen title="Avistamentos" />
