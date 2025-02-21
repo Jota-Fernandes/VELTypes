@@ -38,6 +38,7 @@ export function ProdutosPorArea() {
     }>>([]);
     const [selectedPragas, setSelectedPragas] = useState("");
     const [selectedProdutos, setSelectedProdutos] = useState("");
+    const [qtd, setQtd] = useState("");
     const [selectedArea, setSelectedArea] = useState("");
     const [selectedEquipamentos, setSelectedEquipamentos] = useState("");
     const [renderedItems, setRenderedItems] = useState<any[]>([]);
@@ -54,9 +55,6 @@ export function ProdutosPorArea() {
     }
 
     function renderProdAreas(novaProdAreas: any) {
-
-        console.log('prodAreas',novaProdAreas.produto)
-        console.log('prodAreas',novaProdAreas.praga)
         
         return (
             <ScrollView horizontal={true} key={novaProdAreas.id}>
@@ -64,8 +62,9 @@ export function ProdutosPorArea() {
                     <CustomCheckbox  onPress={() => toggleSelection(novaProdAreas.id)}/>
                     <Cell>{novaProdAreas.area}</Cell>
                     <Cell>{novaProdAreas.produto}</Cell>
+                    <Cell>{novaProdAreas.qtd}</Cell>
                     <Cell>{novaProdAreas.praga}</Cell>
-                    <Cell>{novaProdAreas.equipamento}</Cell>
+                    <Cell>{novaProdAreas.equipto}</Cell>
                 </Row>
             </ScrollView>
         );
@@ -81,7 +80,8 @@ export function ProdutosPorArea() {
             id: Date.now().toString(),    // Gerando um ID único
             roteiro_id: roteiro.roteiro_de_servico_id,  // Criando um ID único
             area: selectedArea,
-            equipamento: selectedEquipamentos,
+            qtd: qtd,
+            equipto: selectedEquipamentos,
             produto: selectedProdutos,
             praga: selectedPragas
         };
@@ -89,11 +89,11 @@ export function ProdutosPorArea() {
         setRenderedItems(prevState => [...prevState, renderProdAreas(novosProdutos)]);
         setValueRendered([...valueRendered, novosProdutos]);
 
-
         setSelectedArea("");
         setSelectedProdutos("");
         setSelectedEquipamentos("");
         setSelectedPragas("");
+        setQtd("")
     }
 
     function handleGoBack(){
@@ -109,6 +109,42 @@ export function ProdutosPorArea() {
         ])
     }
 
+    async function handleFinishService() {
+        if (valueRendered.length === 0) {
+            Alert.alert("Erro", "Nenhuma não conformidade adicionada!");
+            return;
+        }
+
+        try {
+            const realm = await getRealm();
+            realm.write(() => {
+                valueRendered.forEach((item) => {                
+                    console.log("item", item.praga)    
+                    const existe = realm.objects("ProdutosPorAreaTable").filtered(`id == '${item.id}'`).length > 0;
+                 
+                    if (!existe) {
+                        realm.create("ProdutosPorAreaTable", {
+                            id: Date.now().toString(),
+                            roteiro_id: roteiro.roteiro_de_servico_id,
+                            area: item.area,
+                            praga: item.praga,
+                            qtd: item.qtd,
+                            produto: item.produto,
+                            equipto: item.equipto
+                        });
+                    }
+                });
+            });
+
+            Alert.alert("Sucesso", "As não conformidades foram salvas com sucesso!");
+        } catch (error) {
+            console.error("Erro ao salvar no banco:", error);
+        } finally{
+            navigation.goBack()
+        }
+    }
+
+
     async function removeRow() {
         if (selectedItems.length === 0) {
             Alert.alert("Erro", "Nenhuma linha selecionada para remover!");
@@ -119,17 +155,16 @@ export function ProdutosPorArea() {
             const realm = await getRealm();
             realm.write(() => {
                 selectedItems.forEach(id => {
-                    const itemToDelete = realm.objects("").filtered(`id == '${id}'`);
+                    const itemToDelete = realm.objects("ProdutosPorAreaTable").filtered(`id == '${id}'`);
                     if (itemToDelete.length > 0) {
                         realm.delete(itemToDelete);
                     }
                 });
             });
 
-            // Atualiza os estados, removendo os itens excluídos
             setValueRendered(prev => prev.filter(item => !selectedItems.includes(item.id)));
             setRenderedItems(prev => prev.filter(item => !selectedItems.includes(item.key)));
-            setSelectedItems([]); // Limpa a seleção
+            setSelectedItems([]); 
 
             Alert.alert("Sucesso", "Itens removidos com sucesso!");
         } catch (error) {
@@ -172,6 +207,32 @@ export function ProdutosPorArea() {
         }
     }, [roteiro, generalData]);
 
+    useEffect(() => {
+        async function loadProdAreas() {
+            try {
+                const realm = await getRealm();
+                const storedProdAreas = realm.objects("ProdutosPorAreaTable").filtered(`roteiro_id == '${roteiro.roteiro_de_servico_id}'`);
+
+                const loadedItems = storedProdAreas.map((item: any) => ({
+                    id: item.id,
+                    area: item.area,
+                    praga: item.praga,
+                    qtd: item.qtd,
+                    produto: item.produto,
+                    equipto: item.equipto
+                }));
+
+                console.log('Load',loadedItems)
+
+                setValueRendered(loadedItems);
+                setRenderedItems(loadedItems.map(renderProdAreas));
+            } catch (error) {
+                console.error("Erro ao carregar dados do banco:", error);
+            }
+        }
+        loadProdAreas();
+    }, [])
+
     return (
         <Container>
             <HeaderScreen title="Produtos por Área" />
@@ -192,7 +253,9 @@ export function ProdutosPorArea() {
                 <Input 
                     placeholder="Quantidade"
                     keyboardType="number-pad"
-                    />
+                    onChangeText={setQtd}
+                    value={qtd}
+                />
             </SubForm>
 
             <DropdownComponent2 
@@ -213,7 +276,9 @@ export function ProdutosPorArea() {
                     type="PRIMARY"
                     onPress={handleAddProdutos}
                 />
-                <DataTable />
+                <DataTable 
+                    onPress={removeRow}
+                />
                 {renderedItems}
             </ScrollView>
             <ButtonForm>
@@ -222,7 +287,11 @@ export function ProdutosPorArea() {
                     type="SECONDARY" 
                     onPress={handleGoBack}
                 />
-                <Button title="Finalizar" type="TERTIARY"/>
+                <Button 
+                    title="Finalizar" 
+                    type="TERTIARY"
+                    onPress={handleFinishService}
+                />
             </ButtonForm>
         </Container>
     )

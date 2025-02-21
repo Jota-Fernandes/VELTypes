@@ -25,7 +25,8 @@ import {
 } from './schemas/CheckInSchema';
 import { 
     NaoConformidade,
-    Ocorrencias
+    Ocorrencias,
+    ProdutosPorArea
 } from './schemas/TableSchemas';
 
 let realmInstance: Realm | null = null;
@@ -57,10 +58,11 @@ export const getRealm = async () => {
                 VeiculosSchema,
                 GeneralDataSchema,
                 NaoConformidade,
-                Ocorrencias
+                Ocorrencias,
+                ProdutosPorArea
             ],
         });
-        
+     
     }
 
     return realmInstance;

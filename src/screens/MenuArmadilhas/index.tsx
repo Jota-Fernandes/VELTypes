@@ -102,6 +102,7 @@ export function MenuArmadilhas() {
             <Content type="HEADER">
                 <Heading>Nº</Heading>
                 <Heading>Código</Heading>
+                <Heading>Tipo</Heading>
                 <Heading>Local</Heading>
             </Content>
             <FlatList
@@ -110,9 +111,10 @@ export function MenuArmadilhas() {
                 renderItem={({item}) => (
                     <TouchableOpacity onPress={() => navigation.navigate('Armadilha', {roteiro, armadilha: item, generalData})}>
                         <Row>
-                            <Cell style={{width: '30%'}}>{item.numero_armadilha}</Cell>
-                            <Cell style={{width: '35%'}}>{item.tipo_armadilha}</Cell>
-                            <Cell style={{width: '35%'}}>{item.local}</Cell>
+                            <Cell style={{width: '25%'}}>{item.numero_armadilha}</Cell>
+                            <Cell style={{width: '25%'}}>{item.codigo_armadilha}</Cell>
+                            <Cell style={{width: '25%'}}>{item.tipo_armadilha}</Cell>
+                            <Cell style={{width: '25%'}}>{item.local}</Cell>
                         </Row>
                     </TouchableOpacity>
                 )}

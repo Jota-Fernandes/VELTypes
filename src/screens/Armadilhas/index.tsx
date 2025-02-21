@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useState, useEffect } from "react";
 import { Input } from "@components/Input";
 import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
@@ -8,7 +8,7 @@ import { PhotoPhorm } from "@components/PhotoPhorm";
 import {Button} from "@components/Button";
 import { ButtonForm } from "@components/Button/styles";
 import { DropdownComponent2 } from "@components/Dropdown2";
-import { Container, Heading, TitleHeader, Title, SubForm } from "./styles";
+import { Container, TitleHeader, Title, SubForm } from "./styles";
 import { RouteProp } from "@react-navigation/native";
 
 
@@ -23,7 +23,13 @@ export function Armadilha(){
             prod_id: string;
         }>>([]);
     const [selectedProdutos, setSelectedProdutos] = useState('');
-    const [elementos, setElementos] = useState<string[]>([]);
+    const [elementos, setElementos] = useState<Array<{ nome: string; acao: string | null; status: string | null }>>([]);
+    const [selectedStatus, setSelectedStatus] = useState('')
+    const [selectedAcao, setSelectedAcao] = useState('')
+    const [selectedOco, setSelectedOco] = useState('')
+    const [statusList, setStatusList] = useState<Array<{ label: string; value: string }>>([]);
+    const [acaoList, setAcaoList] = useState<Array<{ label: string; value: string }>>([]);
+    const [ocorreciaList, setOcorreciaList] = useState<Array<{ label: string; value: string }>>([]);
 
     const navigation = useNavigation();
 
@@ -40,17 +46,54 @@ export function Armadilha(){
 
     useEffect(() => {
         const armadilhaData = generalData.TiposArm.find(tipo => tipo.tipo_id === armadilha.tipo_de_armadilha_id);
-
-        console.log('armadilha: ', armadilhaData);
-        
+    
         if (armadilhaData) {
-            // Filtra apenas os elementos preenchidos
-            const elementosPreenchidos = Object.values(armadilhaData)
-                .slice(3, 9) // Pega apenas os elementos elem1 a elem6
-                .filter(elem => elem !== ""); // Remove os vazios
-            
+            const elementosPreenchidos = Object.entries(armadilhaData)
+                .slice(3, 9) // Pegando apenas elem1 a elem6
+                .filter(([_, value]) => value !== "") // Remove os vazios
+                .map(([key, value], index) => ({
+                    nome: value as string,
+                    acao: armadilha[`SLOT${index + 1}_ACAO`] || null, // Evita undefined
+                    status: armadilha[`SLOT${index + 1}_STATUS`] || null // Evita undefined
+                }));
+    
             setElementos(elementosPreenchidos);
         }
+    
+        // Garante que apenas strings válidas sejam armazenadas no estado
+        if (generalData.StatusArm) {
+            const statusListExtracted = generalData.StatusArm
+                .map(status => ({
+                    label: status.desc_status ?? "", // Garante que label seja uma string
+                    value: status.status_id ?? ""   // Garante que value seja uma string
+                }))
+                .filter(item => item.label !== "" && item.value !== ""); // Remove itens inválidos
+    
+            setStatusList(statusListExtracted);
+        }
+
+        if (generalData.AcaoArm) {
+            const acaoListExtracted = generalData.AcaoArm
+                .map(status => ({
+                    label: status.desc_acao ?? "",
+                    value: status.acao_id ?? ""
+                }))
+                .filter(item => item.label !== "" && item.value !== ""); // Remove itens inválidos
+    
+            setAcaoList(acaoListExtracted);
+        }
+
+        if (generalData.Ocorrencias) {
+            const ocorrenciaListExtracted = generalData.Ocorrencias
+                .map(status => ({
+                    label: status.desc_oco ?? "",
+                    value: status.oco_id ?? ""
+                }))
+                .filter(item => item.label !== "" && item.value !== ""); // Remove itens inválidos
+    
+            setOcorreciaList(ocorrenciaListExtracted);
+        }
+    
     }, [armadilha, generalData]);
 
     return(
@@ -67,11 +110,23 @@ export function Armadilha(){
                 {elementos.length > 0 && (
                     <>
                         {elementos.map((elem, index) => (
-                            <TitleHeader>                           
-                                <Title key={index}>
-                                    {elem}
-                                </Title>
-                            </TitleHeader>
+                            <View>
+                                <TitleHeader key={index}>                           
+                                    <Title>{elem.nome}</Title>
+                                </TitleHeader>
+                                <DropdownComponent2
+                                    data={statusList}
+                                    label="Status"
+                                    onSelect={setSelectedStatus}
+                                    value={selectedStatus}
+                                />
+                                <DropdownComponent2
+                                    data={acaoList}
+                                    label="Ação"
+                                    onSelect={setSelectedAcao}
+                                    value={selectedAcao}
+                                />
+                            </View>
                         ))}
                     </>
                 )}
@@ -84,7 +139,7 @@ export function Armadilha(){
                     onSelect={setSelectedProdutos}
                     value={selectedProdutos}
                 />
-                <SubForm>
+                <SubForm style={{marginBottom: 10}}>
                     <Input
                         placeholder="Quantidade"
                         type="text"
@@ -96,10 +151,12 @@ export function Armadilha(){
                 <TitleHeader>
                     <Title>Ocorrências</Title>
                 </TitleHeader>
-              {/*   <DropdownComponent2 
-                    data={data}
+                <DropdownComponent2 
+                    data={ocorreciaList}
                     label="Ocorrências"
-                /> */}
+                    onSelect={setSelectedOco}
+                    value={selectedOco}
+                />
                 <SubForm>
                     <Input
                         placeholder="Vivas"

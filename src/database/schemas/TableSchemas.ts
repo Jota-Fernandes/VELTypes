@@ -45,3 +45,25 @@ export class Ocorrencias extends Realm.Object<Ocorrencias> {
     },
   };
 }
+
+export class ProdutosPorArea extends Realm.Object<ProdutosPorArea> {
+  id!: string;
+  roteiro_id!: string;
+  area!: string;
+  produto!: string;
+  qtd!: string;
+  equipto!: string;
+
+  static schema: Realm.ObjectSchema = {
+    name: "ProdutosPorAreaTable",
+    properties: {
+        id: "string",
+        roteiro_id: "string",
+        area: "string",
+        produto: "string",
+        qtd: "string",
+        equipto: "string",
+        praga: "string",
+    },
+  };
+}
