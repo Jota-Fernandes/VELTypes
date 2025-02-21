@@ -12,7 +12,6 @@ export function ServicosExecutados() {
 
     return (
         <Container>
-            <HeaderScreen title="Serviços Executados" />
             <FlatList
                 data={roteiros.filter(roteiro => roteiro.status === '2')}
                 keyExtractor={item => item.roteiro_de_servico_id}

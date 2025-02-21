@@ -130,6 +130,34 @@ export function Avistamentos() {
         ])
     }
 
+    async function removeRow() {
+        if (selectedItems.length === 0) {
+            Alert.alert("Erro", "Nenhuma linha selecionada para remover!");
+            return;
+        }
+
+        try {
+            const realm = await getRealm();
+            realm.write(() => {
+                selectedItems.forEach(id => {
+                    const itemToDelete = realm.objects("OcorrenciasTable").filtered(`id == '${id}'`);
+                    if (itemToDelete.length > 0) {
+                        realm.delete(itemToDelete);
+                    }
+                });
+            });
+
+            // Atualiza os estados, removendo os itens excluídos
+            setValueRendered(prev => prev.filter(item => !selectedItems.includes(item.id)));
+            setRenderedItems(prev => prev.filter(item => !selectedItems.includes(item.key)));
+            setSelectedItems([]); // Limpa a seleção
+
+            Alert.alert("Sucesso", "Itens removidos com sucesso!");
+        } catch (error) {
+            console.error("Erro ao remover do banco:", error);
+        }
+    }
+
     useEffect(() => {
         if (roteiro && roteiro.areas) {
 
@@ -220,7 +248,9 @@ export function Avistamentos() {
                     onPress={handleAddOcorrencia}
                 />
                 
-                <DataTable/>
+                <DataTable
+                    onPress={removeRow}
+                />
                 {renderedItems}
 
             </ScrollView>

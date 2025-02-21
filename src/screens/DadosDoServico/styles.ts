@@ -21,3 +21,15 @@ export const Content = styled.View`
 export const Text = styled.Text`
     font-size: 16px;
 `
+export const SubForm = styled.View`
+    width: 95%;
+    height: 50px;
+    background-color: ${({theme} : DefaultTheme) => theme.COLORS.WHITE};
+
+    border-radius: 25px;
+    align-items: center;
+
+    margin: 0 10px 8px 10px;
+
+    flex-direction: row;
+`

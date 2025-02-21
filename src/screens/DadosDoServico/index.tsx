@@ -1,4 +1,4 @@
-import { Container, Content, Text, Title } from "./styles";
+import { Container, Content, Text, Title, SubForm } from "./styles";
 import { HeaderScreen } from "@components/Header";
 import { PhotoPhorm } from "@components/PhotoPhorm";
 import { Button } from "@components/Button";
@@ -8,7 +8,7 @@ import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from "react";
 import { DropdownComponent2 } from "@components/Dropdown2";
-import Sign from "@components/SignatureScreen";
+import { Input } from "@components/Input";
 
 type DadosServicoRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
@@ -96,6 +96,17 @@ export function DadosServicos() {
                     onSelect={setSelectedVeiculo}
                     value={selectedVeiculo}
                 />
+
+                <SubForm>
+                    <Input
+                        placeholder="Acompanhante"
+                    />
+                </SubForm>
+                <SubForm>
+                    <Input
+                        placeholder="Observação Volta"
+                    />
+                </SubForm>
 
                 <PhotoPhorm title="Foto da Ordem de Serviço"/>
                 <PhotoPhorm title="Fotos adicionais"/>
