@@ -11,7 +11,7 @@ type Props = TouchableOpacityProps & {
 
 export function ScreenCard({icon, title, ...rest} : Props){
     return(
-        <Container {...rest} style={{elevation: 10}}>
+        <Container {...rest}>
             <Icon name={icon}/>
             <Title>
                 {title}

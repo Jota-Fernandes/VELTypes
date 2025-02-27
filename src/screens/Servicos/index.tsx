@@ -1,9 +1,9 @@
-import { useState, useContext, useCallback, useEffect } from "react";
+import { useContext } from "react";
 import { RoteirosContext } from "src/context/RoteirosContext";
-import { FlatList, TouchableOpacity } from "react-native";
+import { FlatList, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
-
+import { LoadingModal } from "@components/Loading";
 import { ListEmpty } from "@components/ListEmpty";
 import { ScreenCard } from "@components/ServiceCard";
 
@@ -11,7 +11,7 @@ import { Container, Title, TextTitle, Icon } from "./styles";
 
 
 export function Servicos() {
-    const {roteiros, generalData} = useContext(RoteirosContext)
+    const {roteiros, generalData, sync} = useContext(RoteirosContext)
     const {t} = useTranslation();
     const navigation = useNavigation();
 
@@ -39,6 +39,7 @@ export function Servicos() {
                 {t("servicos agendados")}
                 </TextTitle>
             </Title>
+            <LoadingModal visible={sync} />
             <FlatList
                 data={roteiros.filter(roteiro => roteiro.status === '1')}
                 keyExtractor={item => item.roteiro_de_servico_id}
@@ -52,11 +53,12 @@ export function Servicos() {
                     </TouchableOpacity>
                 )}
                 ListEmptyComponent={
-                    <ListEmpty message="Não há roteiros"/>
+                        <ListEmpty message="Não há roteiros"/>
+                  
                 }
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={[
-                    { paddingBottom: 100 },
+                    { paddingBottom: 100, flex: 1 },
                     roteiros.length === 0 && { flex: 1 }
                 ]}
             />

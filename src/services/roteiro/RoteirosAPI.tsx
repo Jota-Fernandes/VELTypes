@@ -39,23 +39,26 @@ class RoteirosApi extends ApiManagement {
     }
 
     async sendRoteiros(roteiro: RoteiroSchemaType[]) {
-        console.log("roteiro", roteiro)
+        console.log('RoteirosAPI', roteiro)
+        
         return await Promise.all(
           roteiro.map(async servico => {
+            console.log("roteiro")
             const idServico = servico.roteiro_de_servico_id;
 
             const tableRep = new TableRepository();
             
+
             const naoConformidadesByRoteiroId = await tableRep.getNaoConformidadesByRoteiroId(idServico);
 
             console.log("naoConformidadesByRoteiroId", naoConformidadesByRoteiroId)
-    
+         
+
             const data = [
-/*               {
+             /*  {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
-                packages:
-                  servico.armadilhas.length === 0 ? 1 : servico.armadilhas.length,
+                packages: servico.armadilhas.length === 0 ? 1 : servico.armadilhas.length,
                 type: 'armadilhas',
                 data: servico.armadilhas,
               }, */
@@ -92,7 +95,6 @@ class RoteirosApi extends ApiManagement {
                 data: servico.foto_os,
               }, */
             ];
-    
             const header = {
               roteiro_de_servico_id: idServico,
               token: this._user.token,

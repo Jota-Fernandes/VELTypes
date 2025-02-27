@@ -13,12 +13,16 @@ import { getRealm } from "src/database/realm";
 import { Container, SubForm, Row, Cell } from "./styles";
 import { CustomCheckbox } from "@components/Checkbox";
 
+import { useTranslation } from "react-i18next";
+
 type AvistamentoRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
 export function Avistamentos() {
     const route = useRoute<AvistamentoRouteProp>();
     const {roteiro, generalData} = route.params;
     const navigation = useNavigation();
+
+    const {t} = useTranslation();
 
     const [areas, setAreas] = 
     useState<Array<{
@@ -94,8 +98,7 @@ export function Avistamentos() {
         try{
             const realm = await getRealm();
             realm.write(() =>{
-                valueRendered.forEach((item) => {           
-                    console.log("area", item.area)         
+                valueRendered.forEach((item) => {          
                     const existe = realm.objects("OcorrenciasTable").filtered(`id == '${item.id}'`).length > 0;
                     if (!existe) {
                         realm.create("OcorrenciasTable", {
@@ -118,17 +121,18 @@ export function Avistamentos() {
     }
 
     function handleGoBack(){
-        Alert.alert("Retornar", "Deseja retornar? Os dados que não foram finalizado serão perdidos", [
+        Alert.alert(t("voltar"), t("m_voltar"), [
             {
-                text: 'Sim',
+                text: t("sim"),
                 onPress: () => navigation.goBack()
             },
             {
-                text: 'Não',
+                text: t("nao"),
                 style: 'cancel'
             }
         ])
     }
+
 
     async function removeRow() {
         if (selectedItems.length === 0) {
@@ -213,7 +217,7 @@ export function Avistamentos() {
 
     return (
         <Container>
-            <HeaderScreen title="Avistamentos" />
+            <HeaderScreen title={t("avistamentos")} />
             <SubForm>
                 <Input
                     value={time}
@@ -229,7 +233,7 @@ export function Avistamentos() {
             </SubForm>
             <DropdownComponent2 
                 data={ocorrencias.map(oco => ({ label: oco.desc_oco, value: oco.oco_id }))} 
-                label="Ocorrências"
+                label={t("avistamentos")}
                 onSelect={setSelectedOcorrencia}
                 value={selectedOcorrencia}
             />
@@ -239,16 +243,17 @@ export function Avistamentos() {
                 onSelect={setSelectedArea}
                 value={selectedArea}
             />
-            <PhotoPhorm title="Fotos dos avistamentos" />
+            {/* <PhotoPhorm title="Fotos dos avistamentos" /> */}
 
             <ScrollView>   
                 <Button 
-                    title="Adicionar" 
+                    title={t("adicionar")}
                     type="PRIMARY"
                     onPress={handleAddOcorrencia}
                 />
                 
                 <DataTable
+                    title={t("avistamentos")}
                     onPress={removeRow}
                 />
                 {renderedItems}
@@ -256,13 +261,13 @@ export function Avistamentos() {
             </ScrollView>
                 <ButtonForm>
                     <Button 
-                        title="Voltar" 
+                        title={t("voltar")} 
                         type="SECONDARY"
                         onPress={handleGoBack}
                     />
 
                     <Button 
-                        title="Finalizar" 
+                        title={t("salvar")}
                         type="TERTIARY"
                         onPress={handleFinishService}
                     />

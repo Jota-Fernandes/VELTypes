@@ -8,12 +8,13 @@ export const Container = styled.View`
 
 export const Title = styled.Text`
     font-size: 24px;
-    color: ${({ theme }: DefaultTheme) => theme.COLORS.WHITE};
+    margin-left: 10px;
+    color: ${({ theme }: DefaultTheme) => theme.COLORS.BLACK};
 `;
 
 export const TitleHeader = styled.View`
     width: 100%;
-    background-color: ${({ theme }: DefaultTheme) => theme.COLORS.GRAY_500_MUTED};
+    background-color:#c7c7c7;
     margin-bottom: 10px;
 `
 

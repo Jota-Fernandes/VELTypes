@@ -6,10 +6,12 @@ import { Servicos } from "@screens/Servicos";
 import { CustomDrawerContent } from "@components/CustomDrawer";
 import { MaterialIcons } from "@expo/vector-icons";
 import { View } from "react-native";
-
+import { useTranslation } from "react-i18next";
 const { Navigator, Screen } = createDrawerNavigator();
 
 export function DrawerNavigator(props: any) {
+    const {t} = useTranslation();
+
     return (
         <Navigator 
             drawerContent={(props) => <CustomDrawerContent {...props} />} 
@@ -28,17 +30,17 @@ export function DrawerNavigator(props: any) {
             <Screen 
                 name="Servico" 
                 component={Servicos} 
-                options={{ title: "Serviços" }} 
+                options={{ title: t('servicos') }} 
             />
             <Screen 
                 name="Configurações" 
                 component={Configuracoes} 
-                options={{ title: "Configurações" }} 
+                options={{ title: t('configurações') }} 
             />
             <Screen 
                 name="ServiçosExecutados" 
                 component={ServicosExecutados} 
-                options={{ title: "Serviços Executados" }} 
+                options={{ title: t('servicos executados') }} 
             />
         </Navigator>
     );

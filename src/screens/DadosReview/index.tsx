@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { ScrollView } from "react-native";
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import { Button } from "@components/Button";
+import { useTranslation } from 'react-i18next';
 
 type DadosReviewRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
@@ -14,6 +15,7 @@ export function DadosReview(){
     const {roteiro, generalData} = route.params;
     const [renderedItems, setRenderedItems] = useState<any[]>([]);
     const navigation = useNavigation();
+    const {t} = useTranslation();
 
     function renderNaoConformidade(novaNaoConformidade: any) {
         return (
@@ -79,29 +81,33 @@ export function DadosReview(){
 
     return (
         <Container>
-            <HeaderScreen title="Dados Review" />
-            <HeaderTable>
-                <TitleHeader>Não Conformidades</TitleHeader>
-                <NumbersOfRow>{renderedItems.length}</NumbersOfRow>
-            </HeaderTable>
-            {renderedItems}
-            <HeaderTable>
-                <TitleHeader>Produtos por área</TitleHeader>
-                <NumbersOfRow></NumbersOfRow>
-            </HeaderTable>
-            <HeaderTable>
-                <TitleHeader>Avistamentos</TitleHeader>
-                <NumbersOfRow></NumbersOfRow>
-            </HeaderTable>
-            <HeaderTable>
-                <TitleHeader>Dados do Serviço</TitleHeader>
-                <NumbersOfRow></NumbersOfRow>
-            </HeaderTable>                        
-            <Button 
-                title="Finalizar serviço" 
-                type="TERTIARY"
-                onPress={finishService}
-            />
+            <ScrollView>
+                <HeaderScreen title={t("dados_review")} />
+                <HeaderTable>
+                    <TitleHeader>Não Conformidades</TitleHeader>
+                    <NumbersOfRow>{renderedItems.length}</NumbersOfRow>
+                </HeaderTable>
+                
+                    {renderedItems}
+                
+                <HeaderTable>
+                    <TitleHeader>Produtos por área</TitleHeader>
+                    <NumbersOfRow></NumbersOfRow>
+                </HeaderTable>
+                <HeaderTable>
+                    <TitleHeader>Avistamentos</TitleHeader>
+                    <NumbersOfRow></NumbersOfRow>
+                </HeaderTable>
+                <HeaderTable>
+                    <TitleHeader>Dados do Serviço</TitleHeader>
+                    <NumbersOfRow></NumbersOfRow>
+                </HeaderTable>                        
+                <Button 
+                    title="Finalizar serviço" 
+                    type="TERTIARY"
+                    onPress={finishService}
+                />
+            </ScrollView>
         </Container>
     )
 }

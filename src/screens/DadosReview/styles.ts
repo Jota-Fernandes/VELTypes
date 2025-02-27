@@ -28,7 +28,7 @@ export const Row = styled.View`
     justify-content: space-between;
     min-height: 50px;
     max-height: 80px;
-    padding: 10px;
+    padding: 20px;
     background-color: ${({theme} : DefaultTheme) => theme.COLORS.WHITE};
     border: 1px;
     align-items: center;

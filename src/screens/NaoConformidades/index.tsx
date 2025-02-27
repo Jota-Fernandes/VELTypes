@@ -11,6 +11,7 @@ import { CustomCheckbox } from "@components/Checkbox";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { DropdownComponent2 } from "@components/Dropdown2";
 import { getRealm } from "src/database/realm";
+import { useTranslation } from 'react-i18next';
 
 type NaoConformidadeRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
@@ -52,6 +53,8 @@ export function NaoConformidades() {
         mc_id: string;
         desc_mc: string;
     }>>([]);
+
+    const {t} = useTranslation();
     
     const [selectedArea, setSelectedArea] = useState("");
     const [selectedNaoConformidade, setSelectedNaoConformidade] = useState("");
@@ -59,6 +62,11 @@ export function NaoConformidades() {
     const [selectedResponsavel, setSelectedResponsavel] = useState("");
     const [selectedMedidasCorretivas, setSelectedMedidasCorretivas] = useState("");
     const [selectedPrazo, setSelectedPrazo] = useState("");
+
+    const [selectedAreaId, setSelectedAreaId] = useState("");
+    const [selectedNaoConformidadeId, setSelectedNaoConformidadeId] = useState("");
+    const [selectedMedidasCorretivasId, setSelectedMedidasCorretivasId] = useState("");
+    const [selectedPrazoId, setSelectedPrazoId] = useState("");
 
     const [renderedItems, setRenderedItems] = useState<any[]>([]);
     const [valueRendered, setValueRendered] = useState<any[]>([]);
@@ -95,62 +103,74 @@ export function NaoConformidades() {
             alert("Preencha todos os campos!");
             return;
         }
-
+    
         const novaNaoConformidade = {
             id: Date.now().toString(),    // Gerando um ID único
             roteiro_id: roteiro.roteiro_de_servico_id,  // Criando um ID único
             area: selectedArea,
+            area_id: selectedAreaId,
             naoConformidade: selectedNaoConformidade,
+            naoConformidade_id: selectedNaoConformidadeId,
             registrada: selectedRegistrada,
             responsavel: selectedResponsavel,
             medidasCorretivas: selectedMedidasCorretivas,
+            medidasCorretivas_id: selectedMedidasCorretivasId,
             prazo: selectedPrazo,
+            prazo_id: selectedPrazoId,
         };
-
+    
         setRenderedItems(prevState => [...prevState, renderNaoConformidade(novaNaoConformidade)]);
         setValueRendered([...valueRendered, novaNaoConformidade]);
-
+    
         setSelectedArea("");
+        setSelectedAreaId("");
         setSelectedNaoConformidade("");
+        setSelectedNaoConformidadeId("");
         setSelectedRegistrada("");
         setSelectedResponsavel("");
         setSelectedMedidasCorretivas("");
+        setSelectedMedidasCorretivasId("");
         setSelectedPrazo("");
+        setSelectedPrazoId("");
+    }
+async function handleFinishService() {
+    if (valueRendered.length === 0) {
+        Alert.alert("Erro", "Nenhuma não conformidade adicionada!");
+        return;
     }
 
-    async function handleFinishService() {
-        if (valueRendered.length === 0) {
-            Alert.alert("Erro", "Nenhuma não conformidade adicionada!");
-            return;
-        }
-
-        try {
-            const realm = await getRealm();
-            realm.write(() => {
-                valueRendered.forEach((item) => {                    
-                    const existe = realm.objects("NaoConformidade").filtered(`id == '${item.id}'`).length > 0;
-                    if (!existe) {
-                        realm.create("NaoConformidade", {
-                            id: Date.now().toString(),
-                            roteiro_id: roteiro.roteiro_de_servico_id,
-                            area: item.area,
-                            naoConformidade: item.naoConformidade,
-                            registrada: item.registrada,
-                            responsavel: item.responsavel,
-                            medidasCorretivas: item.medidasCorretivas,
-                            prazo: item.prazo,
-                        });
-                    }
-                });
+    try {
+        const realm = await getRealm();
+        realm.write(() => {
+            valueRendered.forEach((item) => {
+                const existe = realm.objects("NaoConformidade").filtered(`id == '${item.id}'`).length > 0;
+                if (!existe) {
+                    realm.create("NaoConformidade", {
+                        id: item.id, // Mantém como string, pois Date.now() retorna um número
+                        roteiro_id: item.roteiro_id,
+                        area: item.area,
+                        area_id: item.area_id,
+                        naoConformidade: item.naoConformidade,
+                        naoConformidade_id: item.naoConformidade_id,
+                        registrada: item.registrada,
+                        registrada_id: "0",
+                        responsavel: item.responsavel,
+                        medidasCorretivas: item.medidasCorretivas,
+                        medidasCorretivas_id: item.medidasCorretivas_id,
+                        prazo: item.prazo,
+                        prazo_id: item.prazo_id,
+                    });
+                }
             });
+        });
 
-            Alert.alert("Sucesso", "As não conformidades foram salvas com sucesso!");
-        } catch (error) {
-            console.error("Erro ao salvar no banco:", error);
-        } finally{
-            navigation.goBack()
-        }
+        Alert.alert(t("sucesso"), t("m_salvar"));
+    } catch (error) {
+        console.error("Erro ao salvar no banco:", error);
+    } finally {
+        navigation.goBack();
     }
+}
 
     async function removeRow() {
         if (selectedItems.length === 0) {
@@ -174,20 +194,19 @@ export function NaoConformidades() {
             setRenderedItems(prev => prev.filter(item => !selectedItems.includes(item.key)));
             setSelectedItems([]); // Limpa a seleção
 
-            Alert.alert("Sucesso", "Itens removidos com sucesso!");
         } catch (error) {
             console.error("Erro ao remover do banco:", error);
         }
     }
 
     function handleGoBack(){
-        Alert.alert("Retornar", "Deseja retornar? Os dados que não foram finalizado serão perdidos", [
+        Alert.alert(t("voltar"), t("m_voltar"), [
             {
-                text: 'Sim',
+                text: t("sim"),
                 onPress: () => navigation.goBack()
             },
             {
-                text: 'Não',
+                text: t("nao"),
                 style: 'cancel'
             }
         ])
@@ -198,7 +217,7 @@ export function NaoConformidades() {
         if (roteiro && roteiro.areas) {
 
             const listAreas = roteiro.areas.map((item: any, index: number) => ({
-                id: item.area_id,
+                area_id: item.area_id,
                 desc_area: item.desc_area,
             }));
 
@@ -248,68 +267,89 @@ export function NaoConformidades() {
 
     return (
         <Container>
-            <HeaderScreen title="Não Conformidades" />
+            <HeaderScreen title={t("nao_conformidades")} />
                 <DropdownComponent2
                     data={areas.map(area => ({ label: area.desc_area, value: area.area_id }))} 
                     label="Áreas"
-                    onSelect={setSelectedArea}
+                    onSelect={(value : any, id : any) =>{
+                        setSelectedArea(value)
+                        setSelectedAreaId(id)
+                    }}
                     value={selectedArea}
                 />
                 <DropdownComponent2 
                     data={naoConformidade.map(nc => ({ label: nc.desc_nc, value: nc.nc_id }))} 
-                    label="Não conformidade"
-                    onSelect={setSelectedNaoConformidade}
+                    label={t("nao_conformidades")}
+                    onSelect={(value : any, id : any) =>{
+                        setSelectedNaoConformidade(value)
+                        setSelectedNaoConformidadeId(id)
+                    }}
                     value={selectedNaoConformidade}
                 />
                 <DropdownComponent2
                     data={registrada}
                     label="Registrada"
-                    onSelect={setSelectedRegistrada}
+                    onSelect={(value) =>{
+                        setSelectedRegistrada(value)
+                        }
+                    }
                     value={selectedRegistrada}
                 />
                 <DropdownComponent2 
                     data={responsavel}
-                    label="Responsável"
-                    onSelect={setSelectedResponsavel}
+                    label={t("responsavel")}
+                    onSelect={(value) =>{
+                        setSelectedResponsavel(value)
+                        }
+                    }
                     value={selectedResponsavel}
                 />
                 <DropdownComponent2
                     data={medidasCorretivas.map(mc => ({ label: mc.desc_mc, value: mc.mc_id }))} 
-                    label="Medidas Corretivas" 
-                    onSelect={setSelectedMedidasCorretivas}
+                    label={t("medidas_corretivas")}
+                    onSelect={(value : any, id : any) =>{
+                        setSelectedMedidasCorretivas(value)
+                        setSelectedMedidasCorretivasId(id)
+                    }}
                     value={selectedMedidasCorretivas}
                 />
      
                 <DropdownComponent2
                     data={prazo}
-                    label="Prazo"
-                    onSelect={setSelectedPrazo}
+                    label={t("prazo")}
+                    onSelect={(value : any, id : any) =>{
+                        setSelectedPrazo(value)
+                        setSelectedPrazoId(id)
+                    }}
                     value={selectedPrazo}
                 />
                 <ScrollView>
-                    <PhotoPhorm title="Fotos das Não Conformidades"/>
+                   {/*  <PhotoPhorm title="Fotos das Não Conformidades"/> */}
 
                     <Button 
                         onPress={handleAddNaoConformidade}
-                        title="Adicionar" 
+                        title={t("adicionar")} 
                         type="PRIMARY"
                     />
                 
                 
-                        <DataTable onPress={removeRow}/>
+                        <DataTable 
+                            title={t("nao_conformidades")}
+                            onPress={removeRow}
+                        />
                         {renderedItems}
                     
                 </ScrollView>
                     <ButtonForm>
                         <Button 
-                            title="Voltar" 
+                            title={t("voltar")} 
                             type="SECONDARY"
                             onPress={handleGoBack}
                         />
 
                         <Button 
                             onPress={handleFinishService} 
-                            title="Finalizar" 
+                            title={t("salvar")} 
                             type="TERTIARY"
                         />
                     </ButtonForm>

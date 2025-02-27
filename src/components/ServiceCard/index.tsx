@@ -4,7 +4,7 @@ import {MaterialIcons} from '@expo/vector-icons'
 type Props = {
     title: string;
     secondTitle?: string;
-    subtitle: string;
+    subtitle?: string;
 }
 
 export function ScreenCard({title, secondTitle ,subtitle} : Props){

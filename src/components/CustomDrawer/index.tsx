@@ -2,11 +2,12 @@ import { TouchableOpacity, View, Text, SafeAreaView, Image } from "react-native"
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer'
 import { useContext } from "react"
 import { RoteirosContext } from "src/context/RoteirosContext"
-
+import { useTranslation } from "react-i18next"
 import { styles } from './styles'
 
 
 export function CustomDrawerContent(props : any){
+    const {t} = useTranslation();
     const {sincronizar} = useContext(RoteirosContext)
 
     return(

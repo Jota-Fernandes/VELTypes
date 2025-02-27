@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native
 type Props = {
   data: { label: string; value: string }[];  // Array de opções
   label: string;  // Rótulo do dropdown
-  onSelect: (value: string) => void;  // Função que será chamada quando uma opção for selecionada
+  onSelect: (value: string, id: string) => void;  // Função que será chamada quando uma opção for selecionada
   value: string | null;  // Valor selecionado
 };
 
@@ -12,7 +12,9 @@ export const DropdownComponent2 = ({ data, label, onSelect, value }: Props) => {
   const [isOpen, setIsOpen] = useState(false);  // Controle da visibilidade do dropdown
 
   const handleSelect = (item: { label: string, value: string }) => {
-    onSelect(item.label);  // Passa o valor para o componente pai
+    console.log('value',item.value)
+    
+    onSelect(item.label, item.value);  // Passa o valor para o componente pai
     setIsOpen(false);  // Fecha o dropdown após seleção
   };
 

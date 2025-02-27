@@ -6,20 +6,22 @@ import { RoteiroSchemaType } from "src/database/schemas/RoteiroSchema";
 import { SecondGeneralDataType, GeneralDataType } from "src/database/schemas/CheckInSchema";
 import CheckInApi from "src/services/checkIn/CheckInApi";
 import Realm from "realm";
-import TableRepository from "src/Repository/TableRepository";
+import ArmadilhaRepository from "src/Repository/ArmadilhaRepository";
 
 type RoteiroContextType = {
     sincronizar: () => void,
     roteiros: RoteiroSchemaType[];
     loadRoteiros: () => void;
     generalData: GeneralDataType[] | GeneralDataType;
+    sync: boolean;
 }
 
 export const RoteirosContext = createContext<RoteiroContextType>({
     sincronizar: () => {},
     roteiros: [],
     loadRoteiros: () => {},
-    generalData: []
+    generalData: [],
+    sync: false
 })
 
 type RoteiroProviderProps = {
@@ -31,6 +33,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
     const [roteiros, setRoteiros] = useState<RoteiroSchemaType[]>([])
     const {user} = useContext(AuthContext)
     const [generalData, setGeneralData] = useState<GeneralDataType[] | GeneralDataType>([])
+    const [sync, setSync] = useState(false)
 
     async function loadRoteiros(){
         try {
@@ -271,20 +274,25 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
         }
     }
 
-    async function sendRoteirosFinished(){
+    async function sendRoteirosFinished(roteiros :  any){
         const roteiroFinished = new RoteirosApi(user)
 
         try {
-            await roteiroFinished.sendRoteiros(roteiros)
-        } catch(error){
+            const roteiroId = roteiros[0].roteiro_de_servico_id
 
+            console.log(roteiroId)
+            const armadilhas = new ArmadilhaRepository()
+            const armadilhasRecebidas = await armadilhas.getArmadilha(roteiroId)
+            console.log("Armadilhas: ", armadilhasRecebidas )
+            //await roteiroFinished.sendRoteiros(roteiros)
+        } catch(error){
+            console.error('SendRoteirosFinished ==> ', error)
         }
     }
 
     async function sincronizar(){
-
         try{
-            const roteirosFinished = await sendRoteirosFinished()
+            setSync(true)
 
             const roteirosSynced = await requestRoteiros()
 
@@ -295,20 +303,24 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
             const generalDataSynced = await requestGeneralData()
             if(generalDataSynced){
                 saveGeneralData(generalDataSynced);
-            }
+            } 
 
-
+            const roteirosFiltered = roteiros.filter(roteiro => roteiro.status === "2")
+                
+            sendRoteirosFinished(roteirosFiltered);
+           
+            
         } catch(error){
             console.error('Sincronizar roteiros ==> ', error)
         } finally{
             loadRoteiros();
+            setSync(false)
         }
     }
 
     useEffect(() => {
         loadRoteiros();
         loadGeneralData();
-        console.log('general data loaded', generalData)
     },[])
 
     return(
@@ -318,6 +330,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
                 roteiros,
                 generalData,
                 loadRoteiros,
+                sync
             }}
         >
             {children}

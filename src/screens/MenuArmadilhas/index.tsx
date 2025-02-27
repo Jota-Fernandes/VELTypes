@@ -1,80 +1,33 @@
-import { FlatList, TouchableOpacity, TextInput } from "react-native";
-import {MaterialIcons} from '@expo/vector-icons' 
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import uuid from 'react-native-uuid'
-
-import { HeaderScreen } from "@components/Header";
-
-import { Container, Content, Heading, Row, Cell } from "./styles";
 import { useEffect, useState } from "react";
+import { FlatList, TouchableOpacity, TextInput, ActivityIndicator, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { getRealm } from "src/database/realm"; // Supondo que você tenha essa função de conexão com Realm
+import { useTranslation } from 'react-i18next';
+import { HeaderScreen } from "@components/Header";
+import { Container, Content, Heading, Row, Cell } from "./styles";
 
-type MenuArmadilhaRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
+type MenuArmadilhaRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">;
 
 export function MenuArmadilhas() {
     const route = useRoute<MenuArmadilhaRouteProp>();
-    const {roteiro, generalData} = route.params;
+    const { roteiro, generalData } = route.params;
     const navigation = useNavigation();
     const [searchQuery, setSearchQuery] = useState("");
-    
-    const [armadilhas, setArmadilhas] = 
-        useState<Array<{
-            numero_armadilha: string; 
-            tipo_armadilha: string; 
-            local: string, 
-            armadilha_id: string;
-            tipo_de_armadilha_id: string;
-            QTD_CORPOS?: number,
-            QTD_VIVAS?: number,
-            SLOT1_ACAO?: string,
-            SLOT1_STATUS?: string,
-            SLOT2_ACAO?: string,
-            SLOT2_STATUS?: string,
-            SLOT3_ACAO?: string,
-            SLOT3_STATUS?: string,
-            SLOT4_ACAO?: string,                    
-            SLOT4_STATUS?: string,
-            SLOT5_ACAO?: string,                
-            SLOT5_STATUS?: string,
-            SLOT6_ACAO?: string,                
-            SLOT6_STATUS?: string,
-            TIPO_DE_PRAGA_ID?: string,
-            area_id?: string,
-            codigo_armadilha?: string,
-            complemento_area?: string,
-            desc_armadilha?: string,
-            nome_tipo_de_area?: string,
-            nome_tipo_de_armadilha?: string,
-        }>>([]);
+    const {t} = useTranslation();
+    const [armadilhas, setArmadilhas] = useState<Array<any>>([]);
+    const [savedStatus, setSavedStatus] = useState<Record<string, boolean>>({});
+    const [loading, setLoading] = useState(true);
 
-    const filteredArmadilhas = armadilhas.filter(item =>
-        item.numero_armadilha.includes(searchQuery) ||
-        item.tipo_armadilha.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.local.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    
     useEffect(() => {
         if (roteiro && roteiro.armadilhas) {
             const listaArmadilhas = roteiro.armadilhas
                 .map((item: any) => ({
-                    numero_armadilha: item.numero_armadilha, 
-                    tipo_armadilha: item.nome_tipo_de_armadilha, 
+                    numero_armadilha: item.numero_armadilha,
+                    tipo_armadilha: item.nome_tipo_de_armadilha,
                     local: item.nome_tipo_de_area,
-                    armadilha_id: uuid.v4() as string,
+                    armadilha_id: item.armadilha_id,
                     tipo_de_armadilha_id: item.tipo_de_armadilha_id,
-                    QTD_CORPOS: item.QTD_CORPOS,
-                    QTD_VIVAS: item.QTD_VIVAS,
-                    SLOT1_ACAO: item.SLOT1_ACAO,
-                    SLOT1_STATUS: item.SLOT1_STATUS,
-                    SLOT2_ACAO: item.SLOT2_ACAO,
-                    SLOT2_STATUS: item.SLOT2_STATUS,
-                    SLOT3_ACAO: item.SLOT3_ACAO,
-                    SLOT3_STATUS: item.SLOT3_STATUS,
-                    SLOT4_ACAO: item.SLOT4_ACAO,                    
-                    SLOT4_STATUS: item.SLOT4_STATUS,
-                    SLOT5_ACAO: item.SLOT5_ACAO,                
-                    SLOT5_STATUS: item.SLOT5_STATUS,
-                    SLOT6_ACAO: item.SLOT6_ACAO,                
-                    SLOT6_STATUS: item.SLOT6_STATUS,
                     TIPO_DE_PRAGA_ID: item.TIPO_DE_PRAGA_ID,
                     area_id: item.area_id,
                     codigo_armadilha: item.codigo_armadilha,
@@ -84,43 +37,108 @@ export function MenuArmadilhas() {
                     nome_tipo_de_armadilha: item.nome_tipo_de_armadilha,
                     sigla_armadilha: item.sigla_armadilha,
                 }))
-                .sort((a: any, b: any) => Number(a.numero_armadilha) - Number(b.numero_armadilha)); // Ordenação crescente
+                .sort((a: any, b: any) => Number(a.numero_armadilha) - Number(b.numero_armadilha));
 
             setArmadilhas(listaArmadilhas);
         }
     }, [roteiro]);
 
-    return(
+    useEffect(() => {
+        const fetchSavedStatus = async () => {
+            try {
+                const realm = await getRealm();
+                const statusMap: Record<string, boolean> = {};
+
+                // Busca todas as armadilhas salvas no banco
+                const savedArmadilhas = realm.objects<any>("Armadilhas");
+
+                savedArmadilhas.forEach((savedArmadilha: any) => {
+
+                    const hasStatus =
+                        !!savedArmadilha.SLOT1_STATUS ||
+                        !!savedArmadilha.SLOT2_STATUS ||
+                        !!savedArmadilha.SLOT3_STATUS ||
+                        !!savedArmadilha.SLOT4_STATUS ||
+                        !!savedArmadilha.SLOT5_STATUS ||
+                        !!savedArmadilha.SLOT6_STATUS;
+
+                    // Usa o ID da armadilha salva no banco para marcar o status
+                    statusMap[savedArmadilha.armadilha_id] = hasStatus;
+                });
+
+                setSavedStatus(statusMap);
+            } catch (error) {
+                console.error("Erro ao buscar status no Realm:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (armadilhas.length > 0) {
+            fetchSavedStatus();
+            
+        }
+    }, [armadilhas]);
+
+    const filteredArmadilhas = armadilhas.filter(
+        (item) =>
+            item.numero_armadilha.includes(searchQuery) ||
+            item.tipo_armadilha.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.local.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    if (loading) {
+        return (
+            <Container>
+                <HeaderScreen title={t("armadilhas")} />
+                {/* Exibe o ActivityIndicator enquanto os dados são carregados */}
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <ActivityIndicator size="large" color="#00f" />
+                </View>
+            </Container>
+        );
+    }
+
+    return (
         <Container>
-            <HeaderScreen title="Armadilhas" />
+            <HeaderScreen title={t("armadilhas")} />
             <TextInput
-                placeholder="Buscar armadilha..."
+                placeholder={`Buscar ${t("armadilhas")}...`}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
-                style={{ padding: 10, backgroundColor: '#fff', borderRadius: 8 }}
+                style={{ padding: 10, backgroundColor: "#fff", borderRadius: 8 }}
             />
-            <Content type="HEADER">
-                <Heading>Nº</Heading>
-                <Heading>Código</Heading>
-                <Heading>Tipo</Heading>
-                <Heading>Local</Heading>
-            </Content>
+            <Row style={{backgroundColor: "gray"}}>
+                <Heading style={{ width: "10%" }}>Nº</Heading>
+                <Heading style={{ width: "30%" }}>Código</Heading>
+                <Heading style={{ width: "30%" }}>Tipo</Heading>
+                <Heading style={{ width: "30%" }}>Local</Heading>
+            </Row>
             <FlatList
                 data={filteredArmadilhas}
-                keyExtractor={(item) => item.armadilha_id} 
-                renderItem={({item}) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('Armadilha', {roteiro, armadilha: item, generalData})}>
-                        <Row>
-                            <Cell style={{width: '25%'}}>{item.numero_armadilha}</Cell>
-                            <Cell style={{width: '25%'}}>{item.codigo_armadilha}</Cell>
-                            <Cell style={{width: '25%'}}>{item.tipo_armadilha}</Cell>
-                            <Cell style={{width: '25%'}}>{item.local}</Cell>
-                        </Row>
-                    </TouchableOpacity>
-                )}
-                />
+                keyExtractor={(item) => item.armadilha_id}
+                renderItem={({ item }) => {
+                    const hasSavedStatus = savedStatus[item.armadilha_id] ?? false;
+
+                    return (
+                        <TouchableOpacity
+                            onPress={() => {
+                                navigation.navigate("Armadilha", { roteiro, armadilha: item, generalData })
+                            }
+                            }
+                        >
+                            <Row style={{ backgroundColor: hasSavedStatus ? "#00ffee" : "#fbfbfb" }}>
+                                <Cell style={{ width: "10%" }}>{item.numero_armadilha}</Cell>
+                                <Cell style={{ width: "30%" }}>{item.codigo_armadilha}</Cell>
+                                <Cell style={{ width: "30%" }}>{item.tipo_armadilha}</Cell>
+                                <Cell style={{ width: "30%" }}>{item.local}</Cell>
+                            </Row>
+                        </TouchableOpacity>
+                    );
+                }}
+            />
             <Content type="FOOTER">
-                <TouchableOpacity onPress={() => navigation.goBack()}>
+                <TouchableOpacity onPress={() => navigation.navigate("RoteiroMenu", {roteiro, generalData})}>
                     <MaterialIcons name="arrow-back" size={33} color="#ffffff" />
                 </TouchableOpacity>
                 <TouchableOpacity>
@@ -131,5 +149,5 @@ export function MenuArmadilhas() {
                 </TouchableOpacity>
             </Content>
         </Container>
-    )
+    );
 }

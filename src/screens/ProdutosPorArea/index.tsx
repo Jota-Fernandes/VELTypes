@@ -9,7 +9,8 @@ import { DataTable } from "@components/DataTable";
 import { CustomCheckbox } from "@components/Checkbox";
 import { ScrollView, Alert } from "react-native";
 import { Input } from "@components/Input";
-import { DropdownComponent2 } from "@components/Dropdown2"; 
+import { DropdownComponent2 } from "@components/Dropdown2";
+import { useTranslation } from 'react-i18next';
 
 type ProdutosAreaRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
@@ -45,6 +46,8 @@ export function ProdutosPorArea() {
     const [valueRendered, setValueRendered] = useState<any[]>([]);
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const {roteiro, generalData} = route.params
+
+    const {t} = useTranslation();
 
     function toggleSelection(id: string) {
         setSelectedItems(prevSelected => 
@@ -97,13 +100,13 @@ export function ProdutosPorArea() {
     }
 
     function handleGoBack(){
-        Alert.alert("Retornar", "Deseja retornar? Os dados que não foram finalizado serão perdidos", [
+        Alert.alert(t("voltar"), t("m_voltar"), [
             {
-                text: 'Sim',
+                text: t("sim"),
                 onPress: () => navigation.goBack()
             },
             {
-                text: 'Não',
+                text: t("nao"),
                 style: 'cancel'
             }
         ])
@@ -136,7 +139,7 @@ export function ProdutosPorArea() {
                 });
             });
 
-            Alert.alert("Sucesso", "As não conformidades foram salvas com sucesso!");
+            Alert.alert("Sucesso", "Os produtos foram salvos com sucesso!");
         } catch (error) {
             console.error("Erro ao salvar no banco:", error);
         } finally{
@@ -235,7 +238,7 @@ export function ProdutosPorArea() {
 
     return (
         <Container>
-            <HeaderScreen title="Produtos por Área" />
+            <HeaderScreen title={t("produtos_por_areas")} />
             <DropdownComponent2 
                 data={pragas.map(praga => ({ label: praga.desc_praga, value: praga.praga_id }))}
                 label="Pragas"
@@ -277,6 +280,7 @@ export function ProdutosPorArea() {
                     onPress={handleAddProdutos}
                 />
                 <DataTable 
+                    title={t("produtos_por_areas")}
                     onPress={removeRow}
                 />
                 {renderedItems}

@@ -1,15 +1,31 @@
 {
     "translation":{
+        "acao": "Acción",
+        "adicionar": "Agregar",
         "armadilhas": "Trampas",
         "avistamentos": "Avistamientos",
         "baixar_nao_conformidades": "Descargar no conformidades",
-        "dados_do_servico": "Datos de servicio",
+        "configurações": "Configuración",
+        "dados_do_servico": "Datos del Servicio",
+        "dados_review": "Revisión de datos",
         "finalizar_servico": "Fin del servicio",
+        "medidas_corretivas": "Medidas Correctivas",
+        "m_salvar": "¡Las no conformidades fueron guardadas con éxito!",
+        "m_voltar": "¿Desea volver? Los datos que no han sido finalizados se perderán.",
+        "nao": "No",
         "nao_conformidades": "No conformidades",
-        "produtos_por_areas": "Productos por zonas",
+        "prazo": "Plazo",
+        "produtos_por_areas": "Productos por Área",
+        "responsavel": "Responsable",
+        "salvar": "Guardar",
         "salvar_configuracoes": "Guardar configuración de acceso",
         "senha": "Contraseña",
+        "servicos": "Servicios",
         "servicos agendados": "SERVICIOS PROGRAMADOS",
-        "voltar": "Atrás"
+        "servicos executados": "Servicios Prestados",
+        "sim": "Sí",
+        "status": "Situación",
+        "sucesso": "Éxito",
+        "voltar": "Volver"
     }
 }

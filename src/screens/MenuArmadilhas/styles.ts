@@ -11,8 +11,6 @@ export const Content = styled.View`
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-
-
     padding: 10px;
     height: 50px;
 
@@ -20,10 +18,10 @@ export const Content = styled.View`
 `
 
 export const Heading = styled.Text`
-    flex: 1;
-    font-family: ${({theme} : DefaultTheme) => theme.FONT_FAMILY.BOLD};
+    font-family: ${({theme} : DefaultTheme) => theme.FONT_FAMILY.REGULAR};
     color: ${({theme} : DefaultTheme) => theme.COLORS.WHITE};
     font-size: 19px;
+    text-align: left;
 `
 
 export const Row = styled.View`
@@ -41,5 +39,4 @@ export const Cell = styled.Text`
     color: ${({theme} : DefaultTheme) => theme.COLORS.BLACK};
     font-size: 15px;
     text-align: left;
-
 `

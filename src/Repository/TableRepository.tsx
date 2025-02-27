@@ -4,12 +4,12 @@ import { getRealm } from "src/database/realm";
 export type INaoConformidade = {
     id: string;
     roteiro_id: string;
-    area: string;
-    nc: string;
+    area_id: string;
+    naoConformidade_id: string;
     registrada: string;
     responsavel: string;
-    medidasCorretivas: string;
-    prazo: string;
+    medidasCorretivas_id: string;
+    prazo_id: string;
 };
 export default class TableRepository {
     constructor() {}
@@ -55,25 +55,24 @@ export default class TableRepository {
                 .objects<INaoConformidade>("NaoConformidade")
                 .filtered(`roteiro_id == '${idServico}'`);
     
-            const loadedItems = storedNaoConformidades.map((item) => ({
+            const loadedItems: INaoConformidade[] = storedNaoConformidades.map((item) => ({
                 id: item.id,
-                roteiro_id: item.roteiro_id,  // Adicionei caso precise do roteiro_id
-                area: item.area,
-                nc: item.nc,                  // Corrigido de 'naoConformidade' para 'nc'
+                roteiro_id: item.roteiro_id,
+                area_id: item.area_id, // Convertendo para número
+                naoConformidade_id: item.naoConformidade_id, 
                 registrada: item.registrada,
                 responsavel: item.responsavel,
-                medidasCorretivas: item.medidasCorretivas,
-                prazo: item.prazo,
+                medidasCorretivas_id: item.medidasCorretivas_id,
+                prazo_id: item.prazo_id,
             }));
     
             return loadedItems;
         } catch (error) {
             console.error("Erro ao carregar dados do banco:", error);
-            return []; // Retorna um array vazio em caso de erro
+            return []; 
         }
     }
 
-    // ❌ Remover todas as Não Conformidades
     async removeNaoConformidades() {
         try {
             const realm = await this.openRealm();

@@ -4,6 +4,7 @@ export class NaoConformidade extends Realm.Object<NaoConformidade> {
   id!: string;
   roteiro_id!: string;
   area!: string;
+  area_id!: string;
   nc!: string;
   registrada!: string;
   responsavel!: string;
@@ -16,11 +17,16 @@ export class NaoConformidade extends Realm.Object<NaoConformidade> {
         id: "string",
         roteiro_id: "string",
         area: "string",
+        area_id: "string",
         naoConformidade: "string",
+        naoConformidade_id: "string",
         registrada: "string",
+        registrada_id: "string",
         responsavel: "string",
         medidasCorretivas: "string",
+        medidasCorretivas_id: "string",
         prazo: "string",
+        prazo_id: "string"
     },
   };
 }

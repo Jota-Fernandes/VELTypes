@@ -19,7 +19,7 @@ export function ServicosExecutados() {
                     <TouchableOpacity>
                         <ScreenCard
                             title={item.item.nome_cliente}
-                            subtitle={item.item.endereco}
+                            secondTitle="Executado"
                         />
                     </TouchableOpacity>
                 )}

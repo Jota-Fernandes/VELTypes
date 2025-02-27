@@ -9,11 +9,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from "react";
 import { DropdownComponent2 } from "@components/Dropdown2";
 import { Input } from "@components/Input";
+import { useTranslation } from 'react-i18next';
 
 type DadosServicoRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
 export function DadosServicos() {
-    
     const navigation = useNavigation();
     const route = useRoute<DadosServicoRouteProp>();
     const {roteiro, generalData} = route.params;
@@ -21,6 +21,7 @@ export function DadosServicos() {
         veiculo_id: string;
         desc_veiculo: string;
     }>>([]);
+    const {t} = useTranslation();
     const [selectedVeiculo, setSelectedVeiculo] = useState('');
 
     const formatDate = (dateString: string) => {
@@ -50,13 +51,13 @@ export function DadosServicos() {
 
     
     function handleGoBack(){
-        Alert.alert("Retornar", "Deseja retornar? Os dados que não foram finalizado serão perdidos", [
+        Alert.alert(t("voltar"), t("m_voltar"), [
             {
-                text: 'Sim',
+                text: t("sim"),
                 onPress: () => navigation.goBack()
             },
             {
-                text: 'Não',
+                text: t("nao"),
                 style: 'cancel'
             }
         ])
@@ -76,9 +77,9 @@ export function DadosServicos() {
 
     return (
         <Container>
-            <HeaderScreen title="Dados dos Serviços" />
+            <HeaderScreen title={t("dados_do_servico")} />
 
-                <Content>
+                <Content style={{marginTop: 25}}>
                     <Text>{dadosServicos.text}</Text>
                 </Content>
 
@@ -108,8 +109,8 @@ export function DadosServicos() {
                     />
                 </SubForm>
 
-                <PhotoPhorm title="Foto da Ordem de Serviço"/>
-                <PhotoPhorm title="Fotos adicionais"/>
+                {/* <PhotoPhorm title="Foto da Ordem de Serviço"/>
+                <PhotoPhorm title="Fotos adicionais"/> */}
 
                 <Button 
                     title="Prancheta de Assinatura Digital" 
@@ -121,12 +122,12 @@ export function DadosServicos() {
                 />
                 <ButtonForm>
                     <Button 
-                        title="Voltar" 
+                        title={t("voltar")}
                         type="SECONDARY"
                         onPress={handleGoBack}
                     />
                     <Button 
-                        title="Salvar" 
+                        title={t("salvar")}  
                         type="PRIMARY"
                     />
                 </ButtonForm>
