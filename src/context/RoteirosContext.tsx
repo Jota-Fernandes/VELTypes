@@ -3,10 +3,10 @@ import RoteirosApi from "src/services/roteiro/RoteirosAPI";
 import { AuthContext } from "./AuthContext";
 import { getRealm } from "src/database/realm";
 import { RoteiroSchemaType } from "src/database/schemas/RoteiroSchema";
-import { SecondGeneralDataType, GeneralDataType } from "src/database/schemas/CheckInSchema";
+import { GeneralDataType } from "src/database/schemas/CheckInSchema";
 import CheckInApi from "src/services/checkIn/CheckInApi";
 import Realm from "realm";
-import ArmadilhaRepository from "src/Repository/ArmadilhaRepository";
+import { Dispatch, SetStateAction } from "react";
 
 type RoteiroContextType = {
     sincronizar: () => void,
@@ -14,6 +14,7 @@ type RoteiroContextType = {
     loadRoteiros: () => void;
     generalData: GeneralDataType[] | GeneralDataType;
     sync: boolean;
+    setRoteiros: Dispatch<SetStateAction<RoteiroSchemaType[]>>;
 }
 
 export const RoteirosContext = createContext<RoteiroContextType>({
@@ -21,7 +22,8 @@ export const RoteirosContext = createContext<RoteiroContextType>({
     roteiros: [],
     loadRoteiros: () => {},
     generalData: [],
-    sync: false
+    sync: false,
+    setRoteiros: () => {}
 })
 
 type RoteiroProviderProps = {
@@ -154,8 +156,9 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
         const apiReq = new RoteirosApi(user);
         try{
             const response = await apiReq.getRoteiros();
+
             if (response && response.data) {
-                return response.data.roteiros; // Acessa diretamente os dados esperados
+                return response.data.roteiros;
             }
            
         } catch(error){
@@ -278,15 +281,34 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
         const roteiroFinished = new RoteirosApi(user)
 
         try {
-            const roteiroId = roteiros[0].roteiro_de_servico_id
+            await roteiroFinished.sendRoteiros(roteiros)
+            const realm = await getRealm();
 
-            console.log(roteiroId)
-            const armadilhas = new ArmadilhaRepository()
-            const armadilhasRecebidas = await armadilhas.getArmadilha(roteiroId)
-            console.log("Armadilhas: ", armadilhasRecebidas )
-            //await roteiroFinished.sendRoteiros(roteiros)
+            for (let i = 0; i < roteiros.length; i++){
+                realm.write(() => {
+                    let roteiroSync = realm.objectForPrimaryKey('Roteiro', roteiros[i].roteiro_de_servico_id);
+    
+                    if (roteiroSync) {
+                        roteiroSync.status = "3";
+                    } else {
+                        console.log("Roteiro não encontrado");
+                    }
+
+                });
+            }
+
         } catch(error){
             console.error('SendRoteirosFinished ==> ', error)
+        }
+    }
+
+    async function sincronizarRoteiros() {
+        const roteirosSynced = await requestRoteiros();
+
+        console.log("roteirosSynced ==> ", roteirosSynced)
+        if (roteirosSynced) {
+            saveDataRoteiros(roteirosSynced);
+            await sincronizarRoteiros();
         }
     }
 
@@ -294,11 +316,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
         try{
             setSync(true)
 
-            const roteirosSynced = await requestRoteiros()
-
-            if (roteirosSynced) {
-                saveDataRoteiros(roteirosSynced);
-            }
+            await sincronizarRoteiros()
 
             const generalDataSynced = await requestGeneralData()
             if(generalDataSynced){
@@ -306,7 +324,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
             } 
 
             const roteirosFiltered = roteiros.filter(roteiro => roteiro.status === "2")
-                
+              
             sendRoteirosFinished(roteirosFiltered);
            
             
@@ -328,6 +346,7 @@ export function RoteiroProvider({children} : RoteiroProviderProps){
             value={{
                 sincronizar,
                 roteiros,
+                setRoteiros,
                 generalData,
                 loadRoteiros,
                 sync

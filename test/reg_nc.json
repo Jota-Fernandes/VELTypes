@@ -1,0 +1,18 @@
+{
+    "roteiro_de_servico_id": "14957",
+    "token": "ecc022da3a6bbf34",
+    "type": "reg_nc",
+    "packages": 2,
+    "packageId": 1,
+    "data": {
+        "id": "1740630452291",
+        "roteiro_id": "14957",
+        "area_id": "10074",
+        "naoConformidade_id": "38",
+        "registrada": "NÃO",
+        "responsavel": "CLIENTE",
+        "medidasCorretivas_id": "4",
+        "prazo_id": "1"
+    },
+    "charsCount": 172
+}

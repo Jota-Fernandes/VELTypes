@@ -22,7 +22,7 @@ export function Armadilha() {
     const {t} = useTranslation();
 
     const [produtos, setProdutos] = useState<Array<{ nome_prod: string; prod_id: string }>>([]);
-    const [selectedProdutos, setSelectedProdutos] = useState("");
+    //const [selectedProdutos, setSelectedProdutos] = useState("");
     
     const [elementos, setElementos] = useState<Array<{ nome: string; numElem: string }>>([]);
     const [statusList, setStatusList] = useState<Array<{ label: string; value: string; numElem: string }>>([]);
@@ -36,9 +36,14 @@ export function Armadilha() {
     const [saveSuccess, setSaveSuccess] = useState(false); 
     const navigation = useNavigation();
 
+    const getLabelById = (id: string, list: Array<{ label: string; value: string }>) => {
+        const item = list.find(item => item.value === id);
+        return item ? item.label : "";
+    };
+
     const saveDataToRealm = async () => {
         try {
-            const realm = await getRealm(); // Obtendo a instância do Realm
+            const realm = await getRealm();
     
             realm.write(() => {
                 let existingArmadilha = realm.objects<any>("Armadilhas").filtered(`armadilha_id == "${armadilha?.armadilha_id}"`)[0];
@@ -54,7 +59,7 @@ export function Armadilha() {
             });
 
             setSaveSuccess(true); 
-            Alert.alert("Sucesso", "Dados salvos com sucesso!");
+            Alert.alert("Éxito", "¡Guardados con éxito!");
         } catch (error) {
             console.error("Erro ao salvar no Realm:", error);
             setSaveSuccess(false);
@@ -64,16 +69,16 @@ export function Armadilha() {
         }
     };
 
-    useEffect(() => {
+   /*  useEffect(() => {
         if (roteiro) {
             const listProdutos = roteiro.produtos.map((item: any) => ({
                 prod_id: item.prod_id,
                 nome_prod: item.nome_prod,
             }));
 
-            setProdutos([{ prod_id: "", nome_prod: "Produtos" }, ...listProdutos]);
+            setProdutos([...listProdutos]);
         }
-    }, [roteiro]);
+    }, [roteiro]); */
 
     useEffect(() => {
         
@@ -130,13 +135,14 @@ export function Armadilha() {
         const fetchDataFromRealm = async () => {
             try {
                 const realm = await getRealm(); 
-    
-                const savedArmadilhaCollection = realm.objects<any>("Armadilhas").filtered(`armadilha_id == "${armadilha?.armadilha_id}"`);
-
-                console.log("armadilhaColletion",savedArmadilhaCollection);
                 
+            
+                const savedArmadilhaCollection = realm.objects<any>("Armadilhas").filtered(`armadilha_id == "${armadilha?.armadilha_id}"`);
+                
+                console.log("saved", savedArmadilhaCollection)
                 if (savedArmadilhaCollection.length > 0) { 
                     const savedArmadilha = savedArmadilhaCollection[0]; 
+
     
                     const updatedStatus: any = {};
                     const updatedAcao: any = {};
@@ -146,8 +152,6 @@ export function Armadilha() {
                         updatedStatus[i] = savedArmadilha[`SLOT${i + 1}_STATUS`] || "";
                         updatedAcao[i] = savedArmadilha[`SLOT${i + 1}_ACAO`] || "";
                     }
-    
-                    console.log("Status atualizado:", updatedStatus);
     
                     setSelectedStatus(updatedStatus);
                     setSelectedAcao(updatedAcao);
@@ -160,10 +164,8 @@ export function Armadilha() {
         fetchDataFromRealm();
     }, [armadilha?.armadilha_id]);
 
-
     return (
         <Container>
-            <ScrollView>
                 <Text style={{ marginTop: 20, marginLeft: 20, fontSize: 18 }}>
                     {t("armadilhas")} Nº {armadilha.numero_armadilha}
                 </Text>
@@ -178,8 +180,8 @@ export function Armadilha() {
                     elementos
                         .filter(elem => elem.nome !== "") // Filtra elementos vazios
                         .map((elem, index) => {
-                            const filteredStatusList = statusList.filter(status => status.numElem === elem.numElem);
-                            const filteredAcaoList = acaoList.filter(acao => acao.numElem === elem.numElem);
+                            const filteredStatusList = [{ label: "", value: "" }, ...statusList.filter(status => status.numElem === elem.numElem)];
+                            const filteredAcaoList = [{ label: "", value: "" }, ...acaoList.filter(acao => acao.numElem === elem.numElem)];
 
                             return (
                                 <View key={index}>
@@ -189,50 +191,23 @@ export function Armadilha() {
                                     <DropdownComponent2
                                         data={filteredStatusList}
                                         label={t("status")}
-                                        onSelect={value => setSelectedStatus(prev => ({ ...prev, [index]: value }))}
-                                        value={selectedStatus[index] || ""}
+                                        onSelect={(label, value) => {
+                                            setSelectedStatus(prev => ({ ...prev, [index]: value }));
+                                        }}
+                                        value={getLabelById(selectedStatus[index], filteredStatusList)}
                                     />
+
                                     <DropdownComponent2
                                         data={filteredAcaoList}
                                         label={t("acao")}
-                                        onSelect={value => setSelectedAcao(prev => ({ ...prev, [index]: value }))}
-                                        value={selectedAcao[index] || ""}
+                                        onSelect={(label, value) => {
+                                            setSelectedAcao(prev => ({ ...prev, [index]: value }));
+                                        }}
+                                        value={getLabelById(selectedAcao[index], filteredAcaoList)}
                                     />
                                 </View>
                             );
                         })}
-                      {/*          <TitleHeader>
-                    <Title>Produtos</Title>
-                </TitleHeader>
-                <DropdownComponent2
-                    data={produtos.map(produto => ({ label: produto.nome_prod, value: produto.prod_id }))}
-                    label="Produtos"
-                    onSelect={setSelectedProdutos}
-                    value={selectedProdutos}
-                />
-                <SubForm style={{ marginBottom: 10 }}>
-                    <Input placeholder="Quantidade" type="text" />
-                    <TouchableOpacity style={{ marginRight: 10 }}>
-                        <MaterialIcons name="add-circle" size={24} color="green" />
-                    </TouchableOpacity>
-                </SubForm>
- */}
-       {/*          <TitleHeader>
-                    <Title>Ocorrências</Title>
-                </TitleHeader>
-                <DropdownComponent2
-                    data={ocorrenciaList}
-                    label="Ocorrências"
-                    onSelect={setSelectedOco}
-                    value={selectedOco}
-                />
-                <SubForm>
-                    <Input placeholder="Vivas" />
-                    <Input placeholder="Mortas" />
-                    <TouchableOpacity style={{ marginRight: 10 }}>
-                        <MaterialIcons name="add-circle" size={24} color="green" />
-                    </TouchableOpacity>
-                </SubForm> */}
 
                 <ButtonForm>
                     <Button 
@@ -245,7 +220,6 @@ export function Armadilha() {
                         onPress={saveDataToRealm}
                     />
                 </ButtonForm>
-            </ScrollView>
         </Container>
     );
 }

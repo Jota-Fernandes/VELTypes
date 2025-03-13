@@ -31,6 +31,7 @@ export function Servicos() {
         return `${hours}:${minutes}`;
     };
 
+
     return(
         <Container>
             <Title>
@@ -53,7 +54,7 @@ export function Servicos() {
                     </TouchableOpacity>
                 )}
                 ListEmptyComponent={
-                        <ListEmpty message="Não há roteiros"/>
+                        <ListEmpty message={t("nao_roteiros")}/>
                   
                 }
                 showsVerticalScrollIndicator={false}

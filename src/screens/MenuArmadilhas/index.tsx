@@ -6,6 +6,7 @@ import { getRealm } from "src/database/realm"; // Supondo que você tenha essa f
 import { useTranslation } from 'react-i18next';
 import { HeaderScreen } from "@components/Header";
 import { Container, Content, Heading, Row, Cell } from "./styles";
+import { RoteiroSchemaType } from "src/database/schemas/RoteiroSchema";
 
 type MenuArmadilhaRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">;
 
@@ -44,16 +45,28 @@ export function MenuArmadilhas() {
     }, [roteiro]);
 
     useEffect(() => {
-        const fetchSavedStatus = async () => {
+        const fetchSavedStatus = async (roteiro_servico: any) => {
             try {
                 const realm = await getRealm();
+
+                const roteiro = realm.objectForPrimaryKey<RoteiroSchemaType>("Roteiro", roteiro_servico.roteiro_de_servico_id);
+
+                if (!roteiro) {
+                    console.log(`Nenhum roteiro encontrado`);
+                    return [];
+                }
+                const storedArmadilhas = roteiro.armadilhas || [];
+
                 const statusMap: Record<string, boolean> = {};
 
                 // Busca todas as armadilhas salvas no banco
-                const savedArmadilhas = realm.objects<any>("Armadilhas");
+                /* const savedArmadilhas = realm.objects<any>("Armadilhas").filtered(
+                    "roteiro_de_servico_id == $0",
+                    roteiro.roteiro_de_servico_id
+                );
+                 */
 
-                savedArmadilhas.forEach((savedArmadilha: any) => {
-
+                storedArmadilhas.forEach((savedArmadilha: any) => {
                     const hasStatus =
                         !!savedArmadilha.SLOT1_STATUS ||
                         !!savedArmadilha.SLOT2_STATUS ||
@@ -62,8 +75,8 @@ export function MenuArmadilhas() {
                         !!savedArmadilha.SLOT5_STATUS ||
                         !!savedArmadilha.SLOT6_STATUS;
 
-                    // Usa o ID da armadilha salva no banco para marcar o status
-                    statusMap[savedArmadilha.armadilha_id] = hasStatus;
+                    statusMap[savedArmadilha.armadilha_id] = hasStatus
+
                 });
 
                 setSavedStatus(statusMap);
@@ -75,7 +88,7 @@ export function MenuArmadilhas() {
         };
 
         if (armadilhas.length > 0) {
-            fetchSavedStatus();
+            fetchSavedStatus(roteiro);
             
         }
     }, [armadilhas]);
@@ -112,7 +125,7 @@ export function MenuArmadilhas() {
                 <Heading style={{ width: "10%" }}>Nº</Heading>
                 <Heading style={{ width: "30%" }}>Código</Heading>
                 <Heading style={{ width: "30%" }}>Tipo</Heading>
-                <Heading style={{ width: "30%" }}>Local</Heading>
+                <Heading style={{ width: "30%" }}>{t("local")}</Heading>
             </Row>
             <FlatList
                 data={filteredArmadilhas}
@@ -141,12 +154,12 @@ export function MenuArmadilhas() {
                 <TouchableOpacity onPress={() => navigation.navigate("RoteiroMenu", {roteiro, generalData})}>
                     <MaterialIcons name="arrow-back" size={33} color="#ffffff" />
                 </TouchableOpacity>
-                <TouchableOpacity>
+              {/*   <TouchableOpacity>
                     <MaterialIcons name="map" size={33} color="#ffffff" />
-                </TouchableOpacity>
-                <TouchableOpacity>
+                </TouchableOpacity> */}
+               {/*  <TouchableOpacity>
                     <MaterialIcons name="qr-code-scanner" size={33} color="#ffffff" />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </Content>
         </Container>
     );

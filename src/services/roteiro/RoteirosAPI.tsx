@@ -2,6 +2,8 @@ import ApiManagement from "../ApiManagement";
 import { AxiosError, AxiosResponse } from "axios";
 import { RoteiroSchemaType } from "src/database/schemas/RoteiroSchema";
 import TableRepository from "src/Repository/TableRepository";
+import ArmadilhaRepository from "src/Repository/ArmadilhaRepository";
+import ProdutoAreaRepository from "src/Repository/ProdutoAreaRepository";
 
 class RoteirosApi extends ApiManagement {
     constructor(user: { login: string; password: string; id: string; replica: string; token?: string;}){
@@ -21,6 +23,7 @@ class RoteirosApi extends ApiManagement {
         } catch (error) {
             const axiosError = error as AxiosError;
             if (axiosError.response) {
+                console.log('RoteirosAPI - Erro na requisição:', axiosError.response.status);
                 switch (axiosError.response.status) {
                     case 401:
                         console.log('RoteirosAPI - Token expirado, renovando token');
@@ -30,7 +33,7 @@ class RoteirosApi extends ApiManagement {
                             return this.getRoteiros();
                         }
                     default:
-                        console.error('RoteirosAPI - Outro erro', axiosError.message);
+                        console.error('RoteirosAPI - Outro erro', error);
                 }
             } else {
                 console.error('RoteirosAPI - Erro inesperado:', (error as Error).message);
@@ -43,25 +46,27 @@ class RoteirosApi extends ApiManagement {
         
         return await Promise.all(
           roteiro.map(async servico => {
-            console.log("roteiro")
             const idServico = servico.roteiro_de_servico_id;
 
             const tableRep = new TableRepository();
-            
+            const armRep = new ArmadilhaRepository();
+            const prodRep = new ProdutoAreaRepository();
 
             const naoConformidadesByRoteiroId = await tableRep.getNaoConformidadesByRoteiroId(idServico);
 
-            console.log("naoConformidadesByRoteiroId", naoConformidadesByRoteiroId)
-         
+            const armadilhasByRoteiroId = await armRep.getArmadilha(idServico)
+
+            const produtosByRoteiroId = await prodRep.getProdutos(idServico)
 
             const data = [
-             /*  {
+              {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
-                packages: servico.armadilhas.length === 0 ? 1 : servico.armadilhas.length,
+                packages: armadilhasByRoteiroId.length === 0 ? 1 : armadilhasByRoteiroId.length,
                 type: 'armadilhas',
-                data: servico.armadilhas,
-              }, */
+                data: armadilhasByRoteiroId,
+                charsCount: 0
+              },
             /*   {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
@@ -69,16 +74,13 @@ class RoteirosApi extends ApiManagement {
                 type: 'reg_oco',
                 data: servico.reg_oco,
               }, */
-           /*    {
+              {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
-                packages:
-                  servico.reg_prod_area.length === 0
-                    ? 1
-                    : servico.reg_prod_area.length,
+                packages: produtosByRoteiroId.length === 0 ? 1 : produtosByRoteiroId.length,
                 type: 'reg_prod_area',
-                data: servico.reg_prod_area,
-              }, */
+                data: produtosByRoteiroId,
+              },
               {
                 roteiro_de_servico_id: idServico,
                 token: this._user.token,
@@ -111,7 +113,8 @@ class RoteirosApi extends ApiManagement {
             });
     
             header.charsCount = JSON.stringify(header.data).length;
-    
+
+            console.log('data ==>', data[0].packages )
             return await this.axios()
               .post('mobile/servicosExecutados', header)
               .then(async () => {
@@ -119,7 +122,8 @@ class RoteirosApi extends ApiManagement {
                   data.map(async pkg => {
                     if (pkg.packages === 1) {
                       pkg.charsCount = JSON.stringify(pkg.data).length;
-    
+
+                      console.log("o que foi enviado quando é 1: ", pkg)
                       return await this.axios()
                         .post('mobile/servicosExecutados', pkg)
                         .catch(Promise.reject);
@@ -135,6 +139,8 @@ class RoteirosApi extends ApiManagement {
                             data: subpkg,
                             charsCount: JSON.stringify(subpkg).length,
                           };
+
+                          console.log('O que foi enviado quando é mais que 1', toSend)
     
                           return await this.axios()
                             .post('mobile/servicosExecutados', toSend)

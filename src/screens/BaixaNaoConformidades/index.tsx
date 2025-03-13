@@ -6,7 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Button } from "@components/Button";
 import { useState } from "react";
 
-const test = ['Teste 1', 'Teste 2', 'Teste 3', 'Teste 4', 'Teste 5', 'Teste 6', 'Teste 7'];
+const test = ['Teste 1'];
 
 export function BaixaNaoConformidades() {
     const navigation = useNavigation();

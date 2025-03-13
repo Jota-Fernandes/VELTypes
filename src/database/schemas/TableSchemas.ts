@@ -45,7 +45,9 @@ export class Ocorrencias extends Realm.Object<Ocorrencias> {
         id: "string",
         roteiro_id: "string",
         area: "string",
+        area_id: "string",
         ocorrencia: "string",
+        ocorrencia_id: "string",
         data: "string",
         hora: "string",
     },
@@ -66,10 +68,14 @@ export class ProdutosPorArea extends Realm.Object<ProdutosPorArea> {
         id: "string",
         roteiro_id: "string",
         area: "string",
+        area_id: "string",
         produto: "string",
+        produto_id: "string",
         qtd: "string",
         equipto: "string",
+        equipto_id: "string",
         praga: "string",
+        praga_id: "string"
     },
   };
 }

@@ -62,7 +62,6 @@ export const getRealm = async () => {
                 ProdutosPorArea
             ],
         });
-     
     }
 
     return realmInstance;

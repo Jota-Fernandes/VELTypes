@@ -56,11 +56,11 @@ export function Avistamentos() {
         return (
             <ScrollView horizontal={true} key={novaOcorrencia.id}>
                 <Row>
-                    <CustomCheckbox  onPress={() => toggleSelection(novaOcorrencia.id)}/>
-                    <Cell>{novaOcorrencia.area}</Cell>
-                    <Cell>{novaOcorrencia.ocorrencia}</Cell>
-                    <Cell>{novaOcorrencia.data}</Cell>
-                    <Cell>{novaOcorrencia.hora}</Cell>
+                    <CustomCheckbox onPress={() => toggleSelection(novaOcorrencia.id)}/>
+                    <Cell >{novaOcorrencia.area}</Cell>
+                    <Cell >{novaOcorrencia.ocorrencia}</Cell>
+                    <Cell >{novaOcorrencia.data}</Cell>
+                    <Cell style={{width: 100}}>{novaOcorrencia.hora}</Cell>
                 </Row>
             </ScrollView>
         );
@@ -68,7 +68,7 @@ export function Avistamentos() {
 
     function handleAddOcorrencia() {
         if(!selectedOcorrencia || !selectedArea){
-            alert("Preencha todos os campos!");
+            alert("Complete todos los campos");
             return
         }
         
@@ -91,7 +91,7 @@ export function Avistamentos() {
 
     async function handleFinishService(){
         if (valueRendered.length === 0) {
-            Alert.alert("Erro", "Nenhuma não conformidade adicionada!");
+            Alert.alert("Error", "Ningún avistamiento agregado!");
             return;
         }
 
@@ -112,7 +112,7 @@ export function Avistamentos() {
                     }
                 });
             })
-            Alert.alert("Sucesso", "As não conformidades foram salvas com sucesso!");
+            Alert.alert("Éxito", "¡Las no conformidades fueron guardadas con éxito!");
         } catch (error) {
             console.error('Erro ao inserir no banco',error);
         } finally{
@@ -136,7 +136,7 @@ export function Avistamentos() {
 
     async function removeRow() {
         if (selectedItems.length === 0) {
-            Alert.alert("Erro", "Nenhuma linha selecionada para remover!");
+            Alert.alert("Error", "¡Ninguna línea seleccionada para eliminar!");
             return;
         }
 
@@ -156,7 +156,7 @@ export function Avistamentos() {
             setRenderedItems(prev => prev.filter(item => !selectedItems.includes(item.key)));
             setSelectedItems([]); // Limpa a seleção
 
-            Alert.alert("Sucesso", "Itens removidos com sucesso!");
+            Alert.alert("Éxito", "¡Ítems eliminados con éxito!");
         } catch (error) {
             console.error("Erro ao remover do banco:", error);
         }
@@ -178,15 +178,19 @@ export function Avistamentos() {
                 oco_id: item.oco_id,
                 desc_oco: item.desc_oco,
             }));
-            setOcorrencias([{ oco_id: '', desc_oco: 'Não Conformidade' }, ...listOcorrencias]);
+            setOcorrencias([...listOcorrencias]);
 
         }
     }, [roteiro, generalData]);
 
-    useEffect(() =>{
-        const data = now.toLocaleDateString()
-        const hora = now.toLocaleTimeString()
-
+    useEffect(() => {
+        const data = now.toLocaleDateString('pt-BR') // Formato: dd/mm/yyyy
+        const hora = now.toLocaleTimeString('pt-BR', {
+            hour12: false,
+            hour: '2-digit', // Exibe as horas com 2 dígitos
+            minute: '2-digit', // Exibe os minutos com 2 dígitos
+        })
+    
         setDate(data)
         setTime(hora)
     }, [])
@@ -232,13 +236,19 @@ export function Avistamentos() {
                 />
             </SubForm>
             <DropdownComponent2 
-                data={ocorrencias.map(oco => ({ label: oco.desc_oco, value: oco.oco_id }))} 
+                data={[
+                    {label:'', value: ''},
+                    ...ocorrencias.map(oco => ({ label: oco.desc_oco, value: oco.oco_id }))
+                ]} 
                 label={t("avistamentos")}
                 onSelect={setSelectedOcorrencia}
                 value={selectedOcorrencia}
             />
             <DropdownComponent2
-                data={areas.map(area => ({ label: area.desc_area, value: area.area_id }))}  
+                data={[
+                    {label:'', value: ''},
+                    ...areas.map(area => ({ label: area.desc_area, value: area.area_id }))
+                ]}  
                 label="Áreas"
                 onSelect={setSelectedArea}
                 value={selectedArea}

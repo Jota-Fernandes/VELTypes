@@ -2,9 +2,10 @@ import { getRealm } from "src/database/realm";
 import { RoteiroSchemaType } from "src/database/schemas/RoteiroSchema";
 
 export type IArmadilhas = {
+    sistema_id: string;
     roteiro_de_servico_id: string;
-    armadilha_id: string;
-    area_id?: string;
+    armadilha_id: number;
+    area_id?: number;
     complemento_area: string | null;
     sigla_armadilha: string;
     tipo_de_armadilha_id: string;
@@ -15,7 +16,6 @@ export type IArmadilhas = {
     desc_armadilha: string;
     QTD_VIVAS: string | null;
     QTD_CORPOS: string | null;
-    codigo_armadilha: string;
     SLOT1_ACAO: string | null;
     SLOT1_STATUS: string | null;
     SLOT2_ACAO: string | null;
@@ -42,7 +42,6 @@ export default class ArmadilhaRepository{
     }
     
     async getArmadilha(idServico: string): Promise<IArmadilhas[]>{
-        console.log("getArmadilha entrou")
         try {
             const realm = await getRealm();
 
@@ -56,9 +55,10 @@ export default class ArmadilhaRepository{
             const storedArmadilhas = roteiro.armadilhas || [];
     
             const loadedItems: IArmadilhas[] = storedArmadilhas.map((item) => ({
+                sistema_id: roteiro.sistema_id,
                 roteiro_de_servico_id: idServico,
-                armadilha_id: item.armadilha_id ?? "",
-                area_id: item.area_id ?? "",
+                armadilha_id: Number(item.armadilha_id),
+                area_id: Number(item.area_id),
                 complemento_area: item.complemento_area ?? null, 
                 sigla_armadilha: item.sigla_armadilha ?? "",
                 tipo_de_armadilha_id: item.tipo_de_armadilha_id ?? "",
@@ -69,7 +69,6 @@ export default class ArmadilhaRepository{
                 desc_armadilha: item.desc_armadilha ?? "",
                 QTD_VIVAS: item.QTD_VIVAS ?? null,
                 QTD_CORPOS: item.QTD_CORPOS ?? null,
-                codigo_armadilha: item.codigo_armadilha ?? "",
                 SLOT1_ACAO: item.SLOT1_ACAO ?? null,
                 SLOT1_STATUS: item.SLOT1_STATUS ?? null,
                 SLOT2_ACAO: item.SLOT2_ACAO ?? null,

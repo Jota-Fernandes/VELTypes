@@ -18,6 +18,7 @@ export const Container = styled.View`
 
 export const TitleContainer = styled.View`
     margin-left: 10px;
+    width: 100%
 `
 
 export const Title = styled.Text`
@@ -37,6 +38,6 @@ export const Subtitle = styled.Text`
         color: ${theme.COLORS.GRAY_500_MUTED};
         font-size: ${theme.FONT_SIZE.SM}px;
         flex-wrap: wrap;
-        width: 80%;
+        width: 97%;
     `}  
 `

@@ -18,7 +18,9 @@ type AuthContextType = {
     setUser: (user: User) => void;
     signed: boolean;
     setSigned: (signed: boolean) => void;
-    handleLogin: (login: string, password: string, replica: string) => void; 
+    handleLogin: (login: string, password: string, replica: string) => void;
+    login: boolean;
+    setLogin: (login: boolean) => void;
 };
 
 export const AuthContext = createContext<AuthContextType>({ 
@@ -26,7 +28,9 @@ export const AuthContext = createContext<AuthContextType>({
     setUser: () => {}, 
     signed: false, 
     setSigned: () => {}, 
-    handleLogin: () => {} 
+    handleLogin: () => {},
+    login: false,
+    setLogin: () => {}
 });
 
 type AuthProviderProps = {
@@ -44,14 +48,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         sistema: ""
     });
     const [signed, setSigned] = useState(false);
-    /* const navigation = useNavigation();
- */
+    const [login, setLogin] = useState(false)
 
    
 
     async function saveDataUser(userData: AuthSchemaType){
         const realm = await getRealm();
-
+        
         if (!realm || realm.isClosed) {
             console.error("Erro: A instância do Realm não foi aberta corretamente.");
             return;
@@ -100,8 +103,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
             setSigned(true)
 
-        } catch(error){
-            console.error('handleLogin', error)
+        } catch(error : any){
+            console.error('handleLogin: ', error.response)
+            if (error.response?.status) {
+                console.log("Entrou no error.response");
+                return Promise.reject(error.response.status);
+            } else {
+                return Promise.reject(new Error("Erro desconhecido no handleLogin")); 
+            }
         } 
     }
 
@@ -112,7 +121,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 setUser,
                 signed,
                 setSigned,
-                handleLogin
+                handleLogin,
+                login,
+                setLogin
             }}
         >
             {children}

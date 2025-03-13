@@ -1,0 +1,38 @@
+{
+    "roteiro_de_servico_id": "14959",
+    "token": "ecc022da3a6bbf34",
+    "type": "armadilhas",
+    "packages": 96,
+    "packageId": 10,
+    "data": {
+        "sistema_id": "36",
+        "roteiro_de_servico_id": "14959",
+        "armadilha_id": "6260",
+        "area_id": "10074",
+        "complemento_area": "",
+        "sigla_armadilha": "PIP",
+        "tipo_de_armadilha_id": "35",
+        "TIPO_DE_PRAGA_ID": "",
+        "nome_tipo_de_armadilha": "PIP",
+        "nome_tipo_de_area": "ADMINISTRAÇÃO",
+        "numero_armadilha": "18",
+        "desc_armadilha": "",
+        "QTD_VIVAS": 1,
+        "QTD_CORPOS": "2",
+        "codigo_armadilha": "18",
+        "SLOT1_ACAO": "",
+        "SLOT1_STATUS": "",
+        "SLOT2_ACAO": "",
+        "SLOT2_STATUS": "",
+        "SLOT3_ACAO": "",
+        "SLOT3_STATUS": "",
+        "SLOT4_ACAO": "",
+        "SLOT4_STATUS": "",
+        "SLOT5_ACAO": "",
+        "SLOT5_STATUS": "",
+        "SLOT6_ACAO": "",
+        "SLOT6_STATUS": ""
+    },
+    "charsCount": 557
+}
+

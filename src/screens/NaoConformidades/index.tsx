@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { HeaderScreen } from "@components/Header";
 import { Button } from "@components/Button";
@@ -15,27 +14,31 @@ import { useTranslation } from 'react-i18next';
 
 type NaoConformidadeRouteProp = RouteProp<ReactNavigation.RootParamList, "RoteiroMenu">
 
-  const registrada = [
-    { label: '-- Registrada --', value: '0' },
-    { label: 'SIM', value: '1' },
-    { label: 'NÃO', value: '2' },
-  ];
 
-  const responsavel = [
-    { label: '-- Responsável --', value: '0' },
-    { label: 'CLIENTE', value: '1' },
-    { label: 'EMPRESA', value: '2' },
-  ];
-
-  const prazo = [
-    { label: '-- Prazo -- ', value: '0' },
-    { label: 'IMEDIATO', value: '1' },
-    { label: '2 MESES', value: '2' },
-    { label: '3 MESES', value: '3' },
-  ];
 
 export function NaoConformidades() {
+    const {t} = useTranslation();
     const navigation = useNavigation();
+
+    const registrada = [
+        { label: '', value: '' },  
+        { label: t("sim"), value: '1' },
+        { label: t("nao"), value: '2' },
+      ];
+    
+    const responsavel = [
+    { label: '', value: '' },  
+    { label: 'CLIENTE', value: '1' },
+    { label: 'EMPRESA', value: '2' },
+    ];
+
+    const prazo = [
+    { label: '', value: '' },  
+    { label: t("imediato"), value: '1' },
+    { label: '2 MESES', value: '2' },
+    { label: '3 MESES', value: '3' },
+    ];
+
     const route = useRoute<NaoConformidadeRouteProp>();
     const {roteiro, generalData} = route.params;
     const [areas, setAreas] = 
@@ -54,7 +57,6 @@ export function NaoConformidades() {
         desc_mc: string;
     }>>([]);
 
-    const {t} = useTranslation();
     
     const [selectedArea, setSelectedArea] = useState("");
     const [selectedNaoConformidade, setSelectedNaoConformidade] = useState("");
@@ -87,7 +89,7 @@ export function NaoConformidades() {
                 <Row>
                     <CustomCheckbox  onPress={() => toggleSelection(novaNaoConformidade.id)}/>
                     <Cell>{novaNaoConformidade.area}</Cell>
-                    <Cell>{novaNaoConformidade.nc}</Cell>
+                    <Cell>{novaNaoConformidade.naoConformidade}</Cell>
                     <Cell>{novaNaoConformidade.registrada}</Cell>
                     <Cell>{novaNaoConformidade.responsavel}</Cell>
                     <Cell>{novaNaoConformidade.medidasCorretivas}</Cell>
@@ -100,7 +102,7 @@ export function NaoConformidades() {
     function handleAddNaoConformidade() {
         if (!selectedArea || !selectedNaoConformidade || !selectedRegistrada ||
             !selectedResponsavel || !selectedMedidasCorretivas || !selectedPrazo) {
-            alert("Preencha todos os campos!");
+            alert("Complete todos los campos");
             return;
         }
     
@@ -135,7 +137,7 @@ export function NaoConformidades() {
     }
 async function handleFinishService() {
     if (valueRendered.length === 0) {
-        Alert.alert("Erro", "Nenhuma não conformidade adicionada!");
+        Alert.alert("Error", "¡Ninguna no conformidad añadida!");
         return;
     }
 
@@ -174,7 +176,7 @@ async function handleFinishService() {
 
     async function removeRow() {
         if (selectedItems.length === 0) {
-            Alert.alert("Erro", "Nenhuma linha selecionada para remover!");
+            Alert.alert("Error", "¡Ninguna línea seleccionada para eliminar!");
             return;
         }
 
@@ -221,7 +223,7 @@ async function handleFinishService() {
                 desc_area: item.desc_area,
             }));
 
-            setAreas([{ id: '', desc_area: 'Áreas' }, ...listAreas]);
+            setAreas([...listAreas]);
         }
 
         if(generalData){
@@ -229,13 +231,13 @@ async function handleFinishService() {
                 nc_id: item.nc_id,
                 desc_nc: item.desc_nc,
             }));
-            setNaoConformidade([{ nc_id: '', desc_nc: 'Não Conformidade' }, ...listNaoConformidades]);
+            setNaoConformidade([...listNaoConformidades]);
 
             const listMedidasCorretivas = generalData.MedidasCorretivas.map((item: any, index: number) => ({
                 mc_id: item.mc_id,
                 desc_mc: item.desc_mc,
             }));
-            setMedidasCorretivas([{ mc_id: '', desc_mc: 'Medidas Corretivas' }, ...listMedidasCorretivas]);
+            setMedidasCorretivas([...listMedidasCorretivas]);
         }
 
     }, [roteiro, generalData]);
@@ -269,7 +271,10 @@ async function handleFinishService() {
         <Container>
             <HeaderScreen title={t("nao_conformidades")} />
                 <DropdownComponent2
-                    data={areas.map(area => ({ label: area.desc_area, value: area.area_id }))} 
+                    data={[
+                        { label: '', value: '' },
+                        ...areas.map(area => ({ label: area.desc_area, value: area.area_id }))
+                    ]} 
                     label="Áreas"
                     onSelect={(value : any, id : any) =>{
                         setSelectedArea(value)
@@ -278,7 +283,10 @@ async function handleFinishService() {
                     value={selectedArea}
                 />
                 <DropdownComponent2 
-                    data={naoConformidade.map(nc => ({ label: nc.desc_nc, value: nc.nc_id }))} 
+                    data={[
+                        { label: '', value: '' }, // Opção nula
+                        ...naoConformidade.map(nc => ({ label: nc.desc_nc, value: nc.nc_id }))
+                    ]}
                     label={t("nao_conformidades")}
                     onSelect={(value : any, id : any) =>{
                         setSelectedNaoConformidade(value)
@@ -305,7 +313,9 @@ async function handleFinishService() {
                     value={selectedResponsavel}
                 />
                 <DropdownComponent2
-                    data={medidasCorretivas.map(mc => ({ label: mc.desc_mc, value: mc.mc_id }))} 
+                    data={[{label: '', value: ''},
+                        ...medidasCorretivas.map(mc => ({ label: mc.desc_mc, value: mc.mc_id }))
+                    ]} 
                     label={t("medidas_corretivas")}
                     onSelect={(value : any, id : any) =>{
                         setSelectedMedidasCorretivas(value)

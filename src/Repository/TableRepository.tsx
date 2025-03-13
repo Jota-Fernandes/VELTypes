@@ -1,20 +1,17 @@
-import Realm from "realm";
 import { getRealm } from "src/database/realm";
 
 export type INaoConformidade = {
-    id: string;
     roteiro_id: string;
-    area_id: string;
-    naoConformidade_id: string;
+    area_id: number;
+    nc_id: number;
     registrada: string;
-    responsavel: string;
-    medidasCorretivas_id: string;
-    prazo_id: string;
+    resp: string;
+    mc_id: number;
+    prazo: number;
 };
 export default class TableRepository {
     constructor() {}
 
-    // 📂 Abrir conexão com o banco Realm
     async openRealm() {
         try {
             const realm = await getRealm();
@@ -24,7 +21,6 @@ export default class TableRepository {
         }
     }
 
-    // ✅ Inserir uma nova Não Conformidade
     async setNaoConformidade(naoConformidade: INaoConformidade) {
         try {
             const realm = await this.openRealm();
@@ -48,23 +44,24 @@ export default class TableRepository {
         }
     }
 
-    async getNaoConformidadesByRoteiroId(idServico: string): Promise<INaoConformidade[]> {
+    async getNaoConformidadesByRoteiroId(idServico: string): Promise<any> {
         try {
             const realm = await getRealm();
             const storedNaoConformidades = realm
-                .objects<INaoConformidade>("NaoConformidade")
+                .objects("NaoConformidade")
                 .filtered(`roteiro_id == '${idServico}'`);
     
-            const loadedItems: INaoConformidade[] = storedNaoConformidades.map((item) => ({
-                id: item.id,
+            const loadedItems = storedNaoConformidades.map((item) => ({
                 roteiro_id: item.roteiro_id,
-                area_id: item.area_id, // Convertendo para número
-                naoConformidade_id: item.naoConformidade_id, 
-                registrada: item.registrada,
-                responsavel: item.responsavel,
-                medidasCorretivas_id: item.medidasCorretivas_id,
-                prazo_id: item.prazo_id,
+                area_id: Number(item.area_id), 
+                nc_id: Number(item.naoConformidade_id), 
+                registrada: item.registrada_id,
+                resp: item.responsavel,
+                mc_id: Number(item.medidasCorretivas_id),
+                prazo: Number(item.prazo_id),
             }));
+
+            console.log(loadedItems);
     
             return loadedItems;
         } catch (error) {

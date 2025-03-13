@@ -7,7 +7,7 @@ import { Button } from "@components/Button";
 import { ButtonForm } from "@components/Button/styles";
 import { DataTable } from "@components/DataTable";
 import { CustomCheckbox } from "@components/Checkbox";
-import { ScrollView, Alert } from "react-native";
+import { ScrollView, Alert, View, Text } from "react-native";
 import { Input } from "@components/Input";
 import { DropdownComponent2 } from "@components/Dropdown2";
 import { useTranslation } from 'react-i18next';
@@ -19,13 +19,13 @@ export function ProdutosPorArea() {
     const navigation = useNavigation();
     const [areas, setAreas] = 
         useState<Array<{
-            area_id: string; 
-            desc_area: string;
+            value: string; 
+            label: string;
         }>>([]);
     const [equiptos, setEquiptos] = 
     useState<Array<{
-        equipto_id: string; 
-        desc_equipto: string;
+        value: string; 
+        label: string;
     }>>([]);
     const [pragas, setPragas] = 
     useState<Array<{
@@ -36,6 +36,7 @@ export function ProdutosPorArea() {
     useState<Array<{
         nome_prod: string; 
         prod_id: string;
+        unidade: string;
     }>>([]);
     const [selectedPragas, setSelectedPragas] = useState("");
     const [selectedProdutos, setSelectedProdutos] = useState("");
@@ -45,6 +46,12 @@ export function ProdutosPorArea() {
     const [renderedItems, setRenderedItems] = useState<any[]>([]);
     const [valueRendered, setValueRendered] = useState<any[]>([]);
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+    const [selectedProdutosId, setSelectedProdutosId] = useState("");
+    const [selectedAreaId, setSelectedAreaId] = useState("");
+    const [selectedEquipamentosId, setSelectedEquipamentosId] = useState("");
+    const [selectedPragasId, setSelectedPragasId] = useState("");
+
     const {roteiro, generalData} = route.params
 
     const {t} = useTranslation();
@@ -67,7 +74,7 @@ export function ProdutosPorArea() {
                     <Cell>{novaProdAreas.produto}</Cell>
                     <Cell>{novaProdAreas.qtd}</Cell>
                     <Cell>{novaProdAreas.praga}</Cell>
-                    <Cell>{novaProdAreas.equipto}</Cell>
+                    <Cell style={{width: 100}}>{novaProdAreas.equipto}</Cell>
                 </Row>
             </ScrollView>
         );
@@ -75,18 +82,24 @@ export function ProdutosPorArea() {
 
     function handleAddProdutos() {
         if(!selectedProdutos || !selectedPragas){
-            alert("Preencha todos os campos!");
+            alert("Complete todos los campos");
             return
         }
+
+        console.log("console",selectedEquipamentosId)
         
         const novosProdutos = {
             id: Date.now().toString(),    // Gerando um ID único
             roteiro_id: roteiro.roteiro_de_servico_id,  // Criando um ID único
             area: selectedArea,
+            area_id: selectedAreaId,
             qtd: qtd,
             equipto: selectedEquipamentos,
+            equiptos_id: selectedEquipamentosId,
             produto: selectedProdutos,
-            praga: selectedPragas
+            produto_id: selectedProdutosId,
+            praga: selectedPragas,
+            pragas_id: selectedPragasId
         };
 
         setRenderedItems(prevState => [...prevState, renderProdAreas(novosProdutos)]);
@@ -97,6 +110,11 @@ export function ProdutosPorArea() {
         setSelectedEquipamentos("");
         setSelectedPragas("");
         setQtd("")
+
+        setSelectedAreaId("");
+        setSelectedProdutosId("");
+        setSelectedEquipamentosId("");
+        setSelectedPragasId("");
     }
 
     function handleGoBack(){
@@ -114,15 +132,16 @@ export function ProdutosPorArea() {
 
     async function handleFinishService() {
         if (valueRendered.length === 0) {
-            Alert.alert("Erro", "Nenhuma não conformidade adicionada!");
+            Alert.alert(t("erro"), t("m_produto_adicionado"));
             return;
         }
 
         try {
             const realm = await getRealm();
+
+            console.log("rendered", valueRendered)
             realm.write(() => {
-                valueRendered.forEach((item) => {                
-                    console.log("item", item.praga)    
+                valueRendered.forEach((item) => {   
                     const existe = realm.objects("ProdutosPorAreaTable").filtered(`id == '${item.id}'`).length > 0;
                  
                     if (!existe) {
@@ -133,13 +152,17 @@ export function ProdutosPorArea() {
                             praga: item.praga,
                             qtd: item.qtd,
                             produto: item.produto,
-                            equipto: item.equipto
+                            equipto: item.equipto,
+                            area_id: item.area_id,
+                            equipto_id: item.equiptos_id,
+                            produto_id: item.produto_id,
+                            praga_id: item.pragas_id,
                         });
                     }
                 });
             });
 
-            Alert.alert("Sucesso", "Os produtos foram salvos com sucesso!");
+            Alert.alert(t("sucesso"), t("m_produto_sucesso"));
         } catch (error) {
             console.error("Erro ao salvar no banco:", error);
         } finally{
@@ -150,7 +173,7 @@ export function ProdutosPorArea() {
 
     async function removeRow() {
         if (selectedItems.length === 0) {
-            Alert.alert("Erro", "Nenhuma linha selecionada para remover!");
+            Alert.alert(t("erro"), t("m_erro_linha"));
             return;
         }
 
@@ -169,7 +192,6 @@ export function ProdutosPorArea() {
             setRenderedItems(prev => prev.filter(item => !selectedItems.includes(item.key)));
             setSelectedItems([]); 
 
-            Alert.alert("Sucesso", "Itens removidos com sucesso!");
         } catch (error) {
             console.error("Erro ao remover do banco:", error);
         }
@@ -180,17 +202,34 @@ export function ProdutosPorArea() {
         if (roteiro && roteiro.areas) {
 
             const listAreas = roteiro.areas.map((item: any, index: number) => ({
-                id: item.area_id,
-                desc_area: item.desc_area,
+                value: item.area_id,
+                label: item.desc_area,
             }));
-            setAreas([{ id: '', desc_area: 'Áreas' }, ...listAreas]);
+            setAreas([...listAreas]);
 
-            const listProdutos = roteiro.produtos.map((item: any, index: number) => ({
-                prod_id: item.prod_id,
-                nome_prod: item.nome_prod,
-            }));
+            console.log(listAreas);
 
-            setProdutos([{ prod_id: '', nome_prod: 'Produtos' }, ...listProdutos]);
+            for(let i = 0; i < roteiro.produtos.length; i++){
+                    console.log('citado: ',roteiro.produtos[i].citado_ida);
+                    const listProdutos = roteiro.produtos
+                    .filter((item: any) => item.citado_ida === "1") // Filtra os produtos citados
+                    .map((item: any) => ({
+                        nome_prod: item.nome_prod,
+                        prod_id: item.prod_id,
+                        unidade: item.unidade,
+                    }));
+                    setProdutos([...listProdutos]);
+            }
+            
+            /* for(let i = 0; i < roteiro.produtos.length; i++){
+                const listProdutos = roteiro.produtos
+                .map((item: any) => ({
+                    nome_prod: item.nome_prod,
+                    prod_id: item.prod_id,
+                    unidade: item.unidade,
+                }));
+                setProdutos([...listProdutos]);
+            } */
         }
 
         if(generalData){
@@ -198,15 +237,13 @@ export function ProdutosPorArea() {
                 praga_id: item.praga_id,
                 desc_praga: item.desc_praga,
             }));
-            setPragas([{ praga_id: '', desc_praga: 'Pragas' }, ...listPragas]);
+            setPragas([...listPragas]);
 
             const listEquiptos = generalData.Equiptos.map((item: any, index: number) => ({
-                equipto_id: item.equipto_id,
-                desc_equipto: item.desc_equipto,
+                value: item.equipto_id,
+                label: item.desc_equipto,
             }));
-            setEquiptos([{ equipto_id: '', desc_equipto: 'Equipamento' }, ...listEquiptos]);
-
-          
+            setEquiptos([...listEquiptos]);    
         }
     }, [roteiro, generalData]);
 
@@ -225,8 +262,6 @@ export function ProdutosPorArea() {
                     equipto: item.equipto
                 }));
 
-                console.log('Load',loadedItems)
-
                 setValueRendered(loadedItems);
                 setRenderedItems(loadedItems.map(renderProdAreas));
             } catch (error) {
@@ -234,48 +269,94 @@ export function ProdutosPorArea() {
             }
         }
         loadProdAreas();
+
+        console.log("area:", selectedAreaId);
+
+        const equipto = [
+            { label: '', value: '' },
+            ...equiptos.map(equipto => ({ label: equipto.label, value: equipto.value }))
+        ];
+        
+        console.log("Dados passados em variavel equip:", equiptos);
+        console.log("Dados passados para o dropdown de equip:", equipto);
+        console.log("Dados passados para o dropdown de setequipt:", selectedEquipamentosId);
     }, [])
 
     return (
         <Container>
             <HeaderScreen title={t("produtos_por_areas")} />
             <DropdownComponent2 
-                data={pragas.map(praga => ({ label: praga.desc_praga, value: praga.praga_id }))}
-                label="Pragas"
-                onSelect={setSelectedPragas}
+                data={[
+                    { label:'', value:''},
+                    ...pragas.map(praga => ({ label: praga.desc_praga, value: praga.praga_id }))]}
+                label={t("pragas")}
+                onSelect={(value : any, id : any) =>{
+                    setSelectedPragas(value)
+                    setSelectedPragasId(id)
+                }}
                 value={selectedPragas}
             />
             <DropdownComponent2 
-                data={produtos.map(produto => ({ label: produto.nome_prod, value: produto.prod_id }))} 
-                label="Produtos"
-                onSelect={setSelectedProdutos}
+                data={[
+                    { label:'', value:''},
+                    ...produtos.map(produto => ({ label: produto.nome_prod, value: produto.prod_id }))
+                ]} 
+                label={t("produtos")}
+                onSelect={(value : any, id : any) =>{
+                    setSelectedProdutos(value)
+                    setSelectedProdutosId(id)
+                }}
                 value={selectedProdutos}
             />
 
             <SubForm>
                 <Input 
-                    placeholder="Quantidade"
+                    placeholder={t("quantidade")}
                     keyboardType="number-pad"
                     onChangeText={setQtd}
                     value={qtd}
                 />
+                    {
+                        produtos.map(produto => {
+                            if(selectedProdutos === produto.nome_prod){
+                                return(
+                                    <View style={{marginRight: 20}}>
+                                        <Text style={{fontSize: 20}}>
+                                            {produto.unidade}
+                                        </Text>
+                                    </View>
+                                )
+                            }
+                        })           
+                    }
             </SubForm>
 
             <DropdownComponent2 
-                data={areas.map(area => ({ label: area.desc_area, value: area.area_id }))} 
+                data={[
+                    {label: '', value:''},
+                    ...areas.map(area => ({ label: area.label, value: area.value }))
+                ]} 
                 label="Áreas"
-                onSelect={setSelectedArea}
+                onSelect={(value : any, id : any) =>{
+                    setSelectedArea(value)
+                    setSelectedAreaId(id)
+                }}
                 value={selectedArea}
             />
             <DropdownComponent2 
-                data={equiptos.map(equipto => ({ label: equipto.desc_equipto, value: equipto.equipto_id }))} 
-                label="Equipamentos"
-                onSelect={setSelectedEquipamentos}
+                data={[
+                    { label:'', value:''},
+                    ...equiptos.map(equipto => ({ label: equipto.label, value: equipto.value }))]} 
+                label={t("equipamento")}
+                onSelect={(value : any, id : any) =>{
+                    setSelectedEquipamentos(value)
+                    setSelectedEquipamentosId(id)
+                }}
                 value={selectedEquipamentos}
             />
             <ScrollView>            
                 <Button 
-                    title="Adicionar"
+                    title={t("adicionar")}
                     type="PRIMARY"
                     onPress={handleAddProdutos}
                 />
@@ -287,12 +368,12 @@ export function ProdutosPorArea() {
             </ScrollView>
             <ButtonForm>
                 <Button 
-                    title="Voltar" 
+                    title={t("voltar")}
                     type="SECONDARY" 
                     onPress={handleGoBack}
                 />
                 <Button 
-                    title="Finalizar" 
+                    title={t("salvar")}
                     type="TERTIARY"
                     onPress={handleFinishService}
                 />

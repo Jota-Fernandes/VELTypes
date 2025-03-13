@@ -17,11 +17,13 @@ import { useTranslation } from 'react-i18next';
 
 import { Container, Logo, Form, SubForm, LanguageContainer, LanguageTitle } from './styles';
 
+import { LoadingModal } from '@components/Loading';
+
 export default function Login() {
   const { t, i18n } = useTranslation();
 
   const [hidepassword, setHidePassword] = useState(true);
-  const {setUser, handleLogin, signed} = useContext(AuthContext)
+  const {setUser, handleLogin, login, setLogin, signed} = useContext(AuthContext)
   const [userForm, setUserForm] = useState({
     login: '',
     password: '',
@@ -41,26 +43,30 @@ export default function Login() {
 
   async function postLogin(){
     if(userForm.login && userForm.password && userForm.replica){
+
+          setLogin(true)
           try{
 
-            handleLogin(userForm.login, userForm.password, userForm.replica)
-            
+            await handleLogin(userForm.login, userForm.password, userForm.replica)
+
           } catch(error){
               console.log('Login Container - Erro:', error)
               switch(error){
                 case 404:
-                    Alert.alert('Réplica inexistente', 'A réplica informada não existe')
+                    Alert.alert('Réplica inexistente', t("m_replica"))
                     break;
                 case 401:
-                    Alert.alert('Credenciais incorretas', 'Login ou senha incorretos!')
+                    Alert.alert(t("credenciais"), t("m_erro_login"))
                     break;
                 case "UserAlreadyIn":
-                    Alert.alert('Usuário logado', 'Este usuário já está autenticado no aparelho!')
+                    Alert.alert(t("usuario_logado"), t("m_usuario"))
                     break;
                 default:
-                    Alert.alert('Erro inesperado', 'Ocorreu um erro inesperado, entre em contato com o suporte!')
+                    Alert.alert(`${t("erro")}`, t("m_erro_inesperado"))
                     break;
             }
+          } finally{
+            setLogin(false)
           }
       } else {
           Alert.alert(
@@ -71,11 +77,16 @@ export default function Login() {
   }
 
   const handleChange = (name: any) => (value: any) => {
-    if (name === "login" || name === "replica") {
+    if (typeof value === "string") {
+        value = value.trim(); // Remove espaços extras no início e no final
+    }
+
+    if (name === "replica") {
         value = value.normalize('NFD').replace(/([\u0300-\u036f])/g, '').toLowerCase();
     }
+
     setUserForm(prevUser => ({ ...prevUser, [name]: value }));
-  }
+};
 
    async function fetchUsers() {
           const realm = await getRealm()
@@ -83,7 +94,7 @@ export default function Login() {
           try{
               if(!realm.isClosed){
                   const response = realm.objects('Auth')
-                  console.log('response:', Array.from(response))
+                  //console.log('response:', Array.from(response))
   
                   if (response.length > 0) {
                       const firstUser = response[0]; // Pegando o primeiro usuário
@@ -100,7 +111,6 @@ export default function Login() {
                   }
               } else {
                   console.error("Erro: A instância do Realm está fechada.");
-  
               }
               
           } catch(error){
@@ -114,86 +124,94 @@ export default function Login() {
 
   return (
     <Container>
-    <ScrollView>
-      <Logo source={bg_image}/>
-      <Form>
-        <SubForm>
-          <Input 
-            placeholder="Login" 
-            defaultValue={userForm.login}
-            onChangeText={handleChange('login')}
-          />
-        </SubForm>
-
-        <SubForm>
-          <Input 
-            placeholder={t('senha')}
-            secureTextEntry={hidepassword}
-            defaultValue={userForm.password}
-            onChangeText={handleChange('password')}
-          />
-          <ButtonIcon 
-            icon={hidepassword ? "visibility" : "visibility-off"  }
-            onPress={() => setHidePassword(!hidepassword)}
+      <ScrollView>
+        <LoadingModal visible={login} />
+        <Logo source={bg_image}/>
+        <Form>
+          <SubForm>
+            <Input 
+              placeholder="Login"
+              autoComplete="off"
+              textContentType="none"
+              autoCorrect={false}
+              keyboardType="default"
+              defaultValue={userForm.login}
+              onChangeText={handleChange('login')}
+              autocapitalize="none"
             />
-        </SubForm>
+          </SubForm>
 
-        <SubForm>
-          <Input 
-            placeholder="Réplica" 
-            autocapitalize="none"
-            defaultValue={userForm.replica}
-            onChangeText={handleChange('replica')}
-          />
-        </SubForm>
-        
-        <Button 
-          title="Entrar"
-          onPress={postLogin}
-        />
-      </Form>
+          <SubForm>
+            <Input 
+              placeholder={t('senha')}
+              secureTextEntry={hidepassword}
+              defaultValue={userForm.password}
+              onChangeText={handleChange('password')}
+            />
+            <ButtonIcon 
+              icon={hidepassword ? "visibility" : "visibility-off"  }
+              onPress={() => setHidePassword(!hidepassword)}
+              />
+          </SubForm>
 
-      <LanguageContainer>
-        <LanguageTitle style={{marginBottom: 10}}>
-          Selecione o idioma / Seleccionar idioma
-        </LanguageTitle>
-      </LanguageContainer>
-
-      <LanguageContainer>
-        <Pressable
-          onPress={() => changeLanguage('ptbr')}
-          style={{
-            backgroundColor:
-              currentLanguage === 'ptbr' ? '#3A797A' : '#d3d3d3',
-            padding: 20,
-          }}>
-          <Text 
-            style={{
-              color:
-                currentLanguage === 'ptbr' ? '#ffffff' : '#000000',
-            }}
-          >
-              Português
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={() => changeLanguage('es')}
-          style={{
-            backgroundColor:
-              currentLanguage === 'es' ? '#3A797A' : '#d3d3d3',
-            padding: 20,
-          }}>
-          <Text 
-            style={{
-              color:
-                currentLanguage === 'es' ? '#ffffff' : '#000000',
+          <SubForm>
+            <Input 
+              placeholder="Réplica" 
+              autocapitalize="none"
+              defaultValue={userForm.replica}
+              onChangeText={handleChange('replica')}
+            />
+          </SubForm>
           
-            }}
-          >
-              Español
-          </Text>
-        </Pressable>
-      </LanguageContainer>
+          <Button 
+            title="Entrar"
+            onPress={postLogin}
+          />
+        </Form>
+
+        <LanguageContainer>
+          <LanguageTitle style={{marginBottom: 10}}>
+            Selecione o idioma / Seleccionar idioma
+          </LanguageTitle>
+        </LanguageContainer>
+
+        <LanguageContainer>
+          <Pressable
+            onPress={() => changeLanguage('ptbr')}
+            style={{
+              backgroundColor:
+                currentLanguage === 'ptbr' ? '#3A797A' : '#d3d3d3',
+              padding: 20,
+              borderRadius: 10
+            }}>
+            <Text 
+              style={{
+                color:
+                  currentLanguage === 'ptbr' ? '#ffffff' : '#000000',
+              }}
+            >
+                Português
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => changeLanguage('es')}
+            style={{
+              backgroundColor:
+                currentLanguage === 'es' ? '#3A797A' : '#d3d3d3',
+              padding: 20,
+              borderRadius: 10
+            }}>
+            <Text 
+              style={{
+                color:
+                  currentLanguage === 'es' ? '#ffffff' : '#000000',
+            
+              }}
+            >
+                Español
+            </Text>
+          </Pressable>
+        </LanguageContainer>
       </ScrollView>
     </Container>
   );

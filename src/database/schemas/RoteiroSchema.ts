@@ -46,6 +46,7 @@ export type RoteiroSchemaType = {
     nc_previas: Array<Object>,
     nome_cliente: string,
     obs_ida?: string,
+    obs_volta?: string,
     orcamento_id?: string,
     ponto_de_referencia?: string,
     produtos: Array<{
@@ -105,6 +106,7 @@ export const RoteiroSchema = {
         nc_previas: 'NC_previas[]',
         nome_cliente: 'string',
         obs_ida: 'string?',
+        obs_volta: 'string?',
         orcamento_id: 'string?',
         ponto_de_referencia: 'string?',
         produtos: 'Produtos[]',
